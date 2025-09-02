@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.custom_info.mapper.CusInfoMapper">
+    
+    <resultMap type="com.ruoyi.custom_info.domain.CusInfo" id="CusInfoResult">
+        <result property="id"    column="id"    />
+        <result property="customerName"    column="customer_name"    />
+        <result property="contractPaymentTime"    column="contract_payment_time"    />
+        <result property="contractTotalAmount"    column="contract_total_amount"    />
+        <result property="deliveryDate"    column="delivery_date"    />
+        <result property="balancePayment"    column="balance_payment"    />
+        <result property="status"    column="status"    />
+        <result property="salesman"    column="salesman"    />
+        <result property="designer"    column="designer"    />
+        <result property="shipmentProgress"    column="shipment_progress"    />
+        <result property="details"    column="details"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <resultMap id="CusInfoCustomerDetailResult" type="com.ruoyi.custom_info.domain.CusInfo" extends="CusInfoResult">
+        <collection property="customerDetailList" ofType="CustomInfoCustomerDetail" column="id" select="selectCustomerDetailList" />
+    </resultMap>
+
+    <resultMap type="CustomInfoCustomerDetail" id="CustomerDetailResult">
+        <result property="id"    column="id"    />
+        <result property="customId"    column="custom_id"    />
+        <result property="deposit"    column="deposit"    />
+        <result property="customerPhone"    column="customer_phone"    />
+        <result property="backupPhone"    column="backup_phone"    />
+        <result property="address"    column="address"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedTime"    column="updated_time"    />
+        <result property="isDeleted"    column="is_deleted"    />
+    </resultMap>
+
+    <sql id="selectCusInfoVo">
+        select id, customer_name, contract_payment_time, contract_total_amount, delivery_date, balance_payment, status, salesman, designer, shipment_progress, details, created_time, updated_time from cus_info
+    </sql>
+
+    <select id="selectCusInfoList" parameterType="com.ruoyi.custom_info.domain.CusInfo" resultMap="CusInfoResult">
+        <include refid="selectCusInfoVo"/>
+        <where>  
+            <if test="customerName != null  and customerName != ''"> and customer_name like concat('%', #{customerName}, '%')</if>
+            <if test="contractPaymentTime != null "> and contract_payment_time = #{contractPaymentTime}</if>
+            <if test="deliveryDate != null "> and delivery_date = #{deliveryDate}</if>
+            <if test="balancePayment != null "> and balance_payment = #{balancePayment}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="salesman != null  and salesman != ''"> and salesman = #{salesman}</if>
+            <if test="shipmentProgress != null  and shipmentProgress != ''"> and shipment_progress = #{shipmentProgress}</if>
+            <if test="createdTime != null "> and created_time = #{createdTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectCusInfoById" parameterType="Long" resultMap="CusInfoCustomerDetailResult">
+        select id, customer_name, contract_payment_time, contract_total_amount, delivery_date, balance_payment, status, salesman, designer, shipment_progress, details, created_time, updated_time
+        from cus_info
+        where id = #{id}
+    </select>
+
+    <select id="selectCustomerDetailList" resultMap="CustomerDetailResult">
+        select id, custom_id, deposit, customer_phone, backup_phone, address, created_time, updated_time, is_deleted
+        from customer_detail
+        where custom_id = #{custom_id}
+    </select>
+
+    <insert id="insertCusInfo" parameterType="com.ruoyi.custom_info.domain.CusInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into cus_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="customerName != null and customerName != ''">customer_name,</if>
+            <if test="contractPaymentTime != null">contract_payment_time,</if>
+            <if test="contractTotalAmount != null">contract_total_amount,</if>
+            <if test="deliveryDate != null">delivery_date,</if>
+            <if test="balancePayment != null">balance_payment,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="salesman != null and salesman != ''">salesman,</if>
+            <if test="designer != null">designer,</if>
+            <if test="shipmentProgress != null">shipment_progress,</if>
+            <if test="details != null">details,</if>
+            <if test="createdTime != null">created_time,</if>
+            <if test="updatedTime != null">updated_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="customerName != null and customerName != ''">#{customerName},</if>
+            <if test="contractPaymentTime != null">#{contractPaymentTime},</if>
+            <if test="contractTotalAmount != null">#{contractTotalAmount},</if>
+            <if test="deliveryDate != null">#{deliveryDate},</if>
+            <if test="balancePayment != null">#{balancePayment},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="salesman != null and salesman != ''">#{salesman},</if>
+            <if test="designer != null">#{designer},</if>
+            <if test="shipmentProgress != null">#{shipmentProgress},</if>
+            <if test="details != null">#{details},</if>
+            <if test="createdTime != null">#{createdTime},</if>
+            <if test="updatedTime != null">#{updatedTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCusInfo" parameterType="com.ruoyi.custom_info.domain.CusInfo">
+        update cus_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="customerName != null and customerName != ''">customer_name = #{customerName},</if>
+            <if test="contractPaymentTime != null">contract_payment_time = #{contractPaymentTime},</if>
+            <if test="contractTotalAmount != null">contract_total_amount = #{contractTotalAmount},</if>
+            <if test="deliveryDate != null">delivery_date = #{deliveryDate},</if>
+            <if test="balancePayment != null">balance_payment = #{balancePayment},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="salesman != null and salesman != ''">salesman = #{salesman},</if>
+            <if test="designer != null">designer = #{designer},</if>
+            <if test="shipmentProgress != null">shipment_progress = #{shipmentProgress},</if>
+            <if test="details != null">details = #{details},</if>
+            <if test="createdTime != null">created_time = #{createdTime},</if>
+            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCusInfoById" parameterType="Long">
+        delete from cus_info where id = #{id}
+    </delete>
+
+    <delete id="deleteCusInfoByIds" parameterType="String">
+        delete from cus_info where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteCustomerDetailByCustomIds" parameterType="String">
+        delete from customer_detail where custom_id in 
+        <foreach item="customId" collection="array" open="(" separator="," close=")">
+            #{customId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteCustomerDetailByCustomId" parameterType="Long">
+        delete from customer_detail where custom_id = #{customId}
+    </delete>
+
+    <insert id="batchCustomerDetail" parameterType="java.util.List">
+        insert into customer_detail( id, custom_id, deposit, customer_phone, backup_phone, address, created_time, updated_time, is_deleted) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.id}, #{item.customId}, #{item.deposit}, #{item.customerPhone}, #{item.backupPhone}, #{item.address}, #{item.createdTime}, #{item.updatedTime}, #{item.isDeleted})
+        </foreach>
+    </insert>
+</mapper>

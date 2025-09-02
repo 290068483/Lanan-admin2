@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.detail.mapper.CustomerDetailMapper">
+    
+    <resultMap type="DetailCustomerDetail" id="CustomerDetailResult">
+        <result property="id"    column="id"    />
+        <result property="customId"    column="custom_id"    />
+        <result property="deposit"    column="deposit"    />
+        <result property="customerPhone"    column="customer_phone"    />
+        <result property="backupPhone"    column="backup_phone"    />
+        <result property="address"    column="address"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedTime"    column="updated_time"    />
+        <result property="isDeleted"    column="is_deleted"    />
+    </resultMap>
+
+    <sql id="selectCustomerDetailVo">
+        select id, custom_id, deposit, customer_phone, backup_phone, address, created_time, updated_time, is_deleted from customer_detail
+    </sql>
+
+    <select id="selectCustomerDetailList" parameterType="DetailCustomerDetail" resultMap="CustomerDetailResult">
+        <include refid="selectCustomerDetailVo"/>
+        <where>  
+            <if test="customId != null "> and custom_id = #{customId}</if>
+            <if test="deposit != null "> and deposit = #{deposit}</if>
+            <if test="customerPhone != null  and customerPhone != ''"> and customer_phone = #{customerPhone}</if>
+            <if test="backupPhone != null  and backupPhone != ''"> and backup_phone = #{backupPhone}</if>
+            <if test="address != null  and address != ''"> and address = #{address}</if>
+            <if test="createdTime != null "> and created_time = #{createdTime}</if>
+            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
+            <if test="isDeleted != null "> and is_deleted = #{isDeleted}</if>
+        </where>
+    </select>
+    
+    <select id="selectCustomerDetailById" parameterType="Long" resultMap="CustomerDetailResult">
+        <include refid="selectCustomerDetailVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertCustomerDetail" parameterType="DetailCustomerDetail" useGeneratedKeys="true" keyProperty="id">
+        insert into customer_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="customId != null">custom_id,</if>
+            <if test="deposit != null">deposit,</if>
+            <if test="customerPhone != null and customerPhone != ''">customer_phone,</if>
+            <if test="backupPhone != null">backup_phone,</if>
+            <if test="address != null and address != ''">address,</if>
+            <if test="createdTime != null">created_time,</if>
+            <if test="updatedTime != null">updated_time,</if>
+            <if test="isDeleted != null">is_deleted,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="customId != null">#{customId},</if>
+            <if test="deposit != null">#{deposit},</if>
+            <if test="customerPhone != null and customerPhone != ''">#{customerPhone},</if>
+            <if test="backupPhone != null">#{backupPhone},</if>
+            <if test="address != null and address != ''">#{address},</if>
+            <if test="createdTime != null">#{createdTime},</if>
+            <if test="updatedTime != null">#{updatedTime},</if>
+            <if test="isDeleted != null">#{isDeleted},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCustomerDetail" parameterType="DetailCustomerDetail">
+        update customer_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="customId != null">custom_id = #{customId},</if>
+            <if test="deposit != null">deposit = #{deposit},</if>
+            <if test="customerPhone != null and customerPhone != ''">customer_phone = #{customerPhone},</if>
+            <if test="backupPhone != null">backup_phone = #{backupPhone},</if>
+            <if test="address != null and address != ''">address = #{address},</if>
+            <if test="createdTime != null">created_time = #{createdTime},</if>
+            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCustomerDetailById" parameterType="Long">
+        delete from customer_detail where id = #{id}
+    </delete>
+
+    <delete id="deleteCustomerDetailByIds" parameterType="String">
+        delete from customer_detail where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
