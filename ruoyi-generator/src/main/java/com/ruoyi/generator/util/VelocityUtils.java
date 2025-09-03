@@ -1,8 +1,25 @@
+/*
+ *  Copyright 2019-2020 Zheng Jie
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package com.ruoyi.generator.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.apache.velocity.VelocityContext;
 import com.alibaba.fastjson2.JSON;
@@ -103,22 +120,99 @@ public class VelocityUtils
         }
     }
 
+    /**
+     * 设置主子表信息
+     * 
+     * @param context 模板上下文
+     * @param genTable 业务表对象
+     */
     public static void setSubVelocityContext(VelocityContext context, GenTable genTable)
     {
         GenTable subTable = genTable.getSubTable();
         String subTableName = genTable.getSubTableName();
         String subTableFkName = genTable.getSubTableFkName();
-        String subClassName = genTable.getSubTable().getClassName();
-        String subTableFkClassName = StringUtils.convertToCamelCase(subTableFkName);
-
-        context.put("subTable", subTable);
-        context.put("subTableName", subTableName);
-        context.put("subTableFkName", subTableFkName);
-        context.put("subTableFkClassName", subTableFkClassName);
-        context.put("subTableFkclassName", StringUtils.uncapitalize(subTableFkClassName));
-        context.put("subClassName", subClassName);
-        context.put("subclassName", StringUtils.uncapitalize(subClassName));
-        context.put("subImportList", getImportList(genTable.getSubTable()));
+        
+        // 根据subTableType决定如何处理子表
+        Integer subTableType = genTable.getSubTableType();
+        if (subTableType == null) {
+            subTableType = 1; // 默认为一对一
+        }
+        
+        if (subTableType == 1) {
+            // 一对一关系，保持原有处理方式
+            if (subTable != null)
+            {
+                String subClassName = genTable.getSubTable().getClassName();
+                String subTableFkClassName = StringUtils.convertToCamelCase(subTableFkName);
+        
+                context.put("subTable", subTable);
+                context.put("subTableName", subTableName);
+                context.put("subTableFkName", subTableFkName);
+                context.put("subTableFkClassName", subTableFkClassName);
+                context.put("subTableFkclassName", StringUtils.uncapitalize(subTableFkClassName));
+                context.put("subClassName", subClassName);
+                context.put("subclassName", StringUtils.uncapitalize(subClassName));
+                context.put("subImportList", getImportList(genTable.getSubTable()));
+            }
+        } else if (subTableType == 2) {
+            // 一对多关系，处理多个子表
+            List<GenTable> subTables = genTable.getSubTables();
+            if (subTables != null && !subTables.isEmpty())
+            {
+                List<Map<String, Object>> subTableInfos = new ArrayList<>();
+                for (GenTable table : subTables)
+                {
+                    if (table != null)
+                    {
+                        Map<String, Object> subTableInfo = new HashMap<>();
+                        subTableInfo.put("subTable", table);
+                        subTableInfo.put("subTableName", table.getTableName());
+                        // 获取对应的外键名
+                        String fkName = getSubTableFkName(genTable, table.getTableName());
+                        subTableInfo.put("subTableFkName", fkName);
+                        String fkClassName = StringUtils.convertToCamelCase(fkName);
+                        subTableInfo.put("subTableFkClassName", fkClassName);
+                        subTableInfo.put("subTableFkclassName", StringUtils.uncapitalize(fkClassName));
+                        subTableInfo.put("subClassName", table.getClassName());
+                        subTableInfo.put("subclassName", StringUtils.uncapitalize(table.getClassName()));
+                        subTableInfo.put("subImportList", getImportList(table));
+                        subTableInfos.add(subTableInfo);
+                    }
+                }
+                context.put("subTables", subTableInfos);
+            }
+        }
+    }
+    
+    /**
+     * 根据子表名获取对应的外键名
+     * 
+     * @param genTable 主表
+     * @param subTableName 子表名
+     * @return 外键名
+     */
+    private static String getSubTableFkName(GenTable genTable, String subTableName)
+    {
+        String subTableFkNames = genTable.getSubTableFkNames();
+        String subTableNames = genTable.getSubTableNames();
+        
+        if (StringUtils.isEmpty(subTableFkNames) || StringUtils.isEmpty(subTableNames))
+        {
+            return genTable.getSubTableFkName();
+        }
+        
+        String[] fkNames = subTableFkNames.split(",");
+        String[] tableNames = subTableNames.split(",");
+        
+        for (int i = 0; i < tableNames.length; i++)
+        {
+            if (subTableName.equals(tableNames[i].trim()) && i < fkNames.length)
+            {
+                return fkNames[i].trim();
+            }
+        }
+        
+        return genTable.getSubTableFkName();
     }
 
     /**

@@ -6,135 +6,267 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <resultMap type="${ClassName}" id="${ClassName}Result">
 #foreach ($column in $columns)
-        <result property="${column.javaField}"    column="${column.columnName}"    />
+#if($column.pk)
+        <id     property="${column.javaField}"    column="${column.columnName}"      />
+#else
+        <result property="${column.javaField}"    column="${column.columnName}"      />
+#end
+#end
+#if($table.sub)
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
+        <collection  property="${subclassName}List"  javaType="java.util.List"  resultMap="${subClassName}Result" />
+#elseif($subTableType == 2)
+#foreach ($subTableInfo in $table.subTables)
+        <collection  property="${subTableInfo.subclassName}List"  javaType="java.util.List"  resultMap="${subTableInfo.subClassName}Result" />
+#end
+#end
 #end
     </resultMap>
+    
 #if($table.sub)
-
-    <resultMap id="${ClassName}${subClassName}Result" type="${ClassName}" extends="${ClassName}Result">
-        <collection property="${subclassName}List" ofType="${subClassName}" column="${pkColumn.columnName}" select="select${subClassName}List" />
-    </resultMap>
-
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
     <resultMap type="${subClassName}" id="${subClassName}Result">
 #foreach ($column in $subTable.columns)
-        <result property="${column.javaField}"    column="${column.columnName}"    />
+#if($column.pk)
+        <id     property="${column.javaField}"    column="${column.columnName}"      />
+#else
+        <result property="${column.javaField}"    column="${column.columnName}"      />
+#end
+#end
+    </resultMap>
+#elseif($subTableType == 2)
+#foreach ($subTableInfo in $table.subTables)
+    <resultMap type="${subTableInfo.subClassName}" id="${subTableInfo.subClassName}Result">
+#foreach ($column in $subTableInfo.columns)
+#if($column.pk)
+        <id     property="${column.javaField}"    column="${column.columnName}"      />
+#else
+        <result property="${column.javaField}"    column="${column.columnName}"      />
+#end
 #end
     </resultMap>
 #end
-
-    <sql id="select${ClassName}Vo">
-        select#foreach($column in $columns) $column.columnName#if($foreach.count != $columns.size()),#end#end from ${tableName}
+#end
+#end
+    
+    <sql id="${className}Vo">
+#foreach ($column in $columns)
+        ${column.columnName},
+#end
     </sql>
-
+    
+#if($table.sub)
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
+    <sql id="${subclassName}Vo">
+#foreach ($column in $subTable.columns)
+        t.${column.columnName},
+#end
+    </sql>
+#elseif($subTableType == 2)
+#foreach ($subTableInfo in $table.subTables)
+    <sql id="${subTableInfo.subclassName}Vo">
+#foreach ($column in $subTableInfo.columns)
+        t${subTableInfo_index}.${column.columnName},
+#end
+    </sql>
+#end
+#end
+#end
+    
     <select id="select${ClassName}List" parameterType="${ClassName}" resultMap="${ClassName}Result">
-        <include refid="select${ClassName}Vo"/>
-        <where>  
-#foreach($column in $columns)
-#set($queryType=$column.queryType)
-#set($javaField=$column.javaField)
-#set($javaType=$column.javaType)
-#set($columnName=$column.columnName)
-#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-#if($column.query)
-#if($column.queryType == "EQ")
-            <if test="$javaField != null #if($javaType == 'String' ) and $javaField.trim() != ''#end"> and $columnName = #{$javaField}</if>
-#elseif($queryType == "NE")
-            <if test="$javaField != null #if($javaType == 'String' ) and $javaField.trim() != ''#end"> and $columnName != #{$javaField}</if>
-#elseif($queryType == "GT")
-            <if test="$javaField != null #if($javaType == 'String' ) and $javaField.trim() != ''#end"> and $columnName &gt; #{$javaField}</if>
-#elseif($queryType == "GTE")
-            <if test="$javaField != null #if($javaType == 'String' ) and $javaField.trim() != ''#end"> and $columnName &gt;= #{$javaField}</if>
-#elseif($queryType == "LT")
-            <if test="$javaField != null #if($javaType == 'String' ) and $javaField.trim() != ''#end"> and $columnName &lt; #{$javaField}</if>
-#elseif($queryType == "LTE")
-            <if test="$javaField != null #if($javaType == 'String' ) and $javaField.trim() != ''#end"> and $columnName &lt;= #{$javaField}</if>
-#elseif($queryType == "LIKE")
-            <if test="$javaField != null #if($javaType == 'String' ) and $javaField.trim() != ''#end"> and $columnName like concat('%', #{$javaField}, '%')</if>
-#elseif($queryType == "BETWEEN")
-            <if test="params.begin$AttrName != null and params.begin$AttrName != '' and params.end$AttrName != null and params.end$AttrName != ''"> and $columnName between #{params.begin$AttrName} and #{params.end$AttrName}</if>
+        SELECT 
+        <include refid="${className}Vo" />
+#if($table.sub)
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
+        t.${subTableFkName}
 #end
 #end
+        FROM ${tableName}
+#if($table.sub)
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
 #end
-        </where>
+#if($subTableType == 1)
+        LEFT JOIN ${subTableName} t ON ${tableName}.${subTableFkName} = t.${subTableFkName}
+#end
+#end
     </select>
     
-    <select id="select${ClassName}By${pkColumn.capJavaField}" parameterType="${pkColumn.javaType}" resultMap="#if($table.sub)${ClassName}${subClassName}Result#else${ClassName}Result#end">
-#if($table.crud || $table.tree)
-        <include refid="select${ClassName}Vo"/>
-        where ${pkColumn.columnName} = #{${pkColumn.javaField}}
-#elseif($table.sub)
-        select#foreach($column in $columns) $column.columnName#if($foreach.count != $columns.size()),#end#end
-        from ${tableName}
-        where ${pkColumn.columnName} = #{${pkColumn.javaField}}
-#end
-    </select>
+    <select id="select${ClassName}By${pkColumn.capJavaField}" parameterType="${pkColumn.javaType}" resultMap="${ClassName}Result">
+        SELECT 
+        <include refid="${className}Vo"/>
 #if($table.sub)
-
-    <select id="select${subClassName}List" resultMap="${subClassName}Result">
-        select#foreach ($column in $subTable.columns) $column.columnName#if($foreach.count != $subTable.columns.size()),#end#end
-        from ${subTableName}
-        where ${subTableFkName} = #{${subTableFkName}}
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
+        t.${subTableFkName}
+#end
+#end
+        FROM ${tableName}
+#if($table.sub)
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
+        LEFT JOIN ${subTableName} t ON ${tableName}.${subTableFkName} = t.${subTableFkName}
+#end
+#end
+        WHERE ${tableName}.${pkColumn.columnName} = ${r'#{'}${pkColumn.javaField}${r'}'}
     </select>
-#end
-
-    <insert id="insert${ClassName}" parameterType="${ClassName}"#if($pkColumn.increment) useGeneratedKeys="true" keyProperty="$pkColumn.javaField"#end>
-        insert into ${tableName}
+        
+    <insert id="insert${ClassName}" parameterType="${ClassName}" useGeneratedKeys="true" keyProperty="${pkColumn.javaField}">
+        INSERT INTO ${tableName}
         <trim prefix="(" suffix=")" suffixOverrides=",">
-#foreach($column in $columns)
-#if($column.columnName != $pkColumn.columnName || !$pkColumn.increment)
-            <if test="$column.javaField != null#if($column.javaType == 'String' && $column.required) and $column.javaField != ''#end">$column.columnName,</if>
+#foreach ($column in $columns)
+#if($column.pk)
+#if($column.javaField != 'id' && $column.javaType == 'Integer')
+            ${column.columnName},
 #end
+#elseif($column.columnName != $subTableFkName!)
+#if($column.javaField)
+            <if test="${column.javaField} != null${r'${'}$column.javaType == 'String' ? ' and ' + $column.javaField + ' != \'\'': ''}">
+                ${column.columnName},
+            </if>
 #end
-         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-#foreach($column in $columns)
-#if($column.columnName != $pkColumn.columnName || !$pkColumn.increment)
-            <if test="$column.javaField != null#if($column.javaType == 'String' && $column.required) and $column.javaField != ''#end">#{$column.javaField},</if>
-#end
-#end
-         </trim>
-    </insert>
-
-    <update id="update${ClassName}" parameterType="${ClassName}">
-        update ${tableName}
-        <trim prefix="SET" suffixOverrides=",">
-#foreach($column in $columns)
-#if($column.columnName != $pkColumn.columnName)
-            <if test="$column.javaField != null#if($column.javaType == 'String' && $column.required) and $column.javaField != ''#end">$column.columnName = #{$column.javaField},</if>
 #end
 #end
         </trim>
-        where ${pkColumn.columnName} = #{${pkColumn.javaField}}
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+#foreach ($column in $columns)
+#if($column.pk)
+#if($column.javaField != 'id' && $column.javaType == 'Integer')
+            ${r'#{'}${column.javaField}${r'}'},
+#end
+#elseif($column.columnName != $subTableFkName!)
+#if($column.javaField)
+            <if test="${column.javaField} != null${r'${'}$column.javaType == 'String' ? ' and ' + $column.javaField + ' != \'\'': ''}">
+                ${r'#{'}${column.javaField}${r'}'},
+            </if>
+#end
+#end
+#end
+        </trim>
+    </insert>
+	 
+    <update id="update${ClassName}" parameterType="${ClassName}">
+        UPDATE ${tableName}
+        <set>
+#foreach ($column in $columns)
+#if(!$column.pk && $column.columnName != $subTableFkName!)
+#if($column.javaField)
+            <if test="${column.javaField} != null${r'${'}$column.javaType == 'String' ? ' and ' + $column.javaField + ' != \'\'': ''}">
+                ${column.columnName} = ${r'#{'}${column.javaField}${r'}'},
+            </if>
+#end
+#end
+#end
+        </set>
+        WHERE ${pkColumn.columnName} = ${r'#{'}${pkColumn.javaField}${r'}'}
     </update>
-
+	
     <delete id="delete${ClassName}By${pkColumn.capJavaField}" parameterType="${pkColumn.javaType}">
-        delete from ${tableName} where ${pkColumn.columnName} = #{${pkColumn.javaField}}
+        DELETE FROM ${tableName} WHERE ${pkColumn.columnName} = ${r'#{'}${pkColumn.javaField}${r'}'}
     </delete>
-
+    
     <delete id="delete${ClassName}By${pkColumn.capJavaField}s" parameterType="String">
-        delete from ${tableName} where ${pkColumn.columnName} in 
+        DELETE FROM ${tableName} WHERE ${pkColumn.columnName} IN 
         <foreach item="${pkColumn.javaField}" collection="array" open="(" separator="," close=")">
-            #{${pkColumn.javaField}}
+             ${r'#{'}${pkColumn.javaField}${r'}'}
         </foreach>
     </delete>
+    
 #if($table.sub)
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
+    <select id="select${ClassName}By${pkColumn.capJavaField}" parameterType="${pkColumn.javaType}" resultMap="${ClassName}Result">
+        SELECT a.${pkColumn.columnName},
+#foreach ($column in $columns)
+#if($column.columnName != $pkColumn.columnName)
+        a.${column.columnName},
+#end
+#end
+        <include refid="${subclassName}Vo"/>
+        FROM ${tableName} a
+        LEFT JOIN ${subTableName} t ON t.${subTableFkName} = a.${pkColumn.columnName}
+        WHERE a.${pkColumn.columnName} = ${r'#{'}${pkColumn.javaField}${r'}'}
+    </select>
+    
+    <delete id="delete${subClassName}By${subTableFkClassName}" parameterType="${pkColumn.javaType}">
+        DELETE FROM ${subTableName} WHERE ${subTableFkName} = ${r'#{'}${pkColumn.javaField}${r'}'}
+    </delete>
     
     <delete id="delete${subClassName}By${subTableFkClassName}s" parameterType="String">
-        delete from ${subTableName} where ${subTableFkName} in 
-        <foreach item="${subTableFkclassName}" collection="array" open="(" separator="," close=")">
-            #{${subTableFkclassName}}
+        DELETE FROM ${subTableName} WHERE ${subTableFkName} IN 
+        <foreach item="${pkColumn.javaField}" collection="array" open="(" separator="," close=")">
+             ${r'#{'}${pkColumn.javaField}${r'}'}
         </foreach>
     </delete>
-
-    <delete id="delete${subClassName}By${subTableFkClassName}" parameterType="${pkColumn.javaType}">
-        delete from ${subTableName} where ${subTableFkName} = #{${subTableFkclassName}}
-    </delete>
-
+    
     <insert id="batch${subClassName}">
-        insert into ${subTableName}(#foreach($column in $subTable.columns) $column.columnName#if($foreach.count != $subTable.columns.size()),#end#end) values
-        <foreach item="item" index="index" collection="list" separator=",">
-            (#foreach($column in $subTable.columns) #{item.$column.javaField}#if($foreach.count != $subTable.columns.size()),#end#end)
+        INSERT INTO ${subTableName}(
+#foreach ($column in $subTable.columns)
+        ${column.columnName}<#if $column_has_next>,</#if>
+#end
+        ) VALUES
+        <foreach item="item" collection="list" separator=",">
+        (
+#foreach ($column in $subTable.columns)
+        ${r'#{item.'}${column.javaField}${r'}'}<#if $column_has_next>,</#if>
+#end
+        )
         </foreach>
     </insert>
+#elseif($subTableType == 2)
+#foreach ($subTableInfo in $table.subTables)
+    <delete id="delete${subTableInfo.subClassName}By${subTableInfo.subTableFkClassName}" parameterType="${pkColumn.javaType}">
+        DELETE FROM ${subTableInfo.subTableName} WHERE ${subTableInfo.subTableFkName} = ${r'#{'}${pkColumn.javaField}${r'}'}
+    </delete>
+    
+    <delete id="delete${subTableInfo.subClassName}By${subTableInfo.subTableFkClassName}s" parameterType="String">
+        DELETE FROM ${subTableInfo.subTableName} WHERE ${subTableInfo.subTableFkName} IN 
+        <foreach item="${pkColumn.javaField}" collection="array" open="(" separator="," close=")">
+             ${r'#{'}${pkColumn.javaField}${r'}'}
+        </foreach>
+    </delete>
+    
+    <insert id="batch${subTableInfo.subClassName}">
+        INSERT INTO ${subTableInfo.subTableName}(
+#foreach ($column in $subTableInfo.columns)
+        ${column.columnName}<#if $column_has_next>,</#if>
+#end
+        ) VALUES
+        <foreach item="item" collection="list" separator=",">
+        (
+#foreach ($column in $subTableInfo.columns)
+        ${r'#{item.'}${column.javaField}${r'}'}<#if $column_has_next>,</#if>
+#end
+        )
+        </foreach>
+    </insert>
+#end
+#end
 #end
 </mapper>

@@ -2,9 +2,6 @@ package ${packageName}.mapper;
 
 import java.util.List;
 import ${packageName}.domain.${ClassName};
-#if($table.sub)
-import ${packageName}.domain.${subClassName};
-#end
 
 /**
  * ${functionName}Mapper接口
@@ -57,35 +54,70 @@ public interface ${ClassName}Mapper
     /**
      * 批量删除${functionName}
      * 
-     * @param ${pkColumn.javaField}s 需要删除的数据主键集合
+     * @param ${pkColumn.javaField}s 需要删除的数据主键数组
      * @return 结果
      */
     public int delete${ClassName}By${pkColumn.capJavaField}s(${pkColumn.javaType}[] ${pkColumn.javaField}s);
+    
 #if($table.sub)
-
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
     /**
-     * 批量删除${subTable.functionName}
+     * 批量删除${subTableName}
      * 
-     * @param ${pkColumn.javaField}s 需要删除的数据主键集合
+     * @param ${pkColumn.javaField}s 需要删除的数据主键数组
      * @return 结果
      */
     public int delete${subClassName}By${subTableFkClassName}s(${pkColumn.javaType}[] ${pkColumn.javaField}s);
     
     /**
-     * 批量新增${subTable.functionName}
+     * 批量新增${subTableName}
      * 
-     * @param ${subclassName}List ${subTable.functionName}列表
+     * @param ${subclassName}List ${subTableName}列表
      * @return 结果
      */
     public int batch${subClassName}(List<${subClassName}> ${subclassName}List);
     
 
     /**
-     * 通过${functionName}主键删除${subTable.functionName}信息
+     * 通过${functionName}主键删除${subTableName}信息
      * 
      * @param ${pkColumn.javaField} ${functionName}ID
      * @return 结果
      */
     public int delete${subClassName}By${subTableFkClassName}(${pkColumn.javaType} ${pkColumn.javaField});
+    
+#elseif($subTableType == 2)
+#foreach ($subTableInfo in $table.subTables)
+    /**
+     * 批量删除${subTableInfo.subTableName}
+     * 
+     * @param ${pkColumn.javaField}s 需要删除的数据主键数组
+     * @return 结果
+     */
+    public int delete${subTableInfo.subClassName}By${subTableInfo.subTableFkClassName}s(${pkColumn.javaType}[] ${pkColumn.javaField}s);
+    
+    /**
+     * 批量新增${subTableInfo.subTableName}
+     * 
+     * @param ${subTableInfo.subclassName}List ${subTableInfo.subTableName}列表
+     * @return 结果
+     */
+    public int batch${subTableInfo.subClassName}(List<${subTableInfo.subClassName}> ${subTableInfo.subclassName}List);
+    
+
+    /**
+     * 通过${functionName}主键删除${subTableInfo.subTableName}信息
+     * 
+     * @param ${pkColumn.javaField} ${functionName}ID
+     * @return 结果
+     */
+    public int delete${subTableInfo.subClassName}By${subTableInfo.subTableFkClassName}(${pkColumn.javaType} ${pkColumn.javaField});
+    
+#end
+#end
 #end
 }

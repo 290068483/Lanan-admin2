@@ -4,7 +4,6 @@ import java.util.List;
 #foreach ($column in $columns)
 #if($column.javaField == 'createTime' || $column.javaField == 'updateTime')
 import com.ruoyi.common.utils.DateUtils;
-#break
 #end
 #end
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,17 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import com.ruoyi.common.utils.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
 import ${packageName}.domain.${subClassName};
+#elseif($subTableType == 2)
+#foreach ($subTableInfo in $table.subTables)
+import ${packageName}.domain.${subTableInfo.subClassName};
+#end
+#end
 #end
 import ${packageName}.mapper.${ClassName}Mapper;
 import ${packageName}.domain.${ClassName};
@@ -73,9 +82,24 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service
 #end
 #end
 #if($table.sub)
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
         int rows = ${className}Mapper.insert${ClassName}(${className});
         insert${subClassName}(${className});
         return rows;
+#elseif($subTableType == 2)
+        int rows = ${className}Mapper.insert${ClassName}(${className});
+        
+        // 处理多个子表
+#foreach ($subTableInfo in $table.subTables)
+        insert${subTableInfo.subClassName}(${className});
+#end
+        
+        return rows;
+#end
 #else
         return ${className}Mapper.insert${ClassName}(${className});
 #end
@@ -99,8 +123,24 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service
 #end
 #end
 #if($table.sub)
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
         ${className}Mapper.delete${subClassName}By${subTableFkClassName}(${className}.get${pkColumn.capJavaField}());
         insert${subClassName}(${className});
+#elseif($subTableType == 2)
+        // 删除多个子表数据
+#foreach ($subTableInfo in $table.subTables)
+        ${className}Mapper.delete${subTableInfo.subClassName}By${subTableInfo.subTableFkClassName}(${className}.get${pkColumn.capJavaField}());
+#end
+        
+        // 插入多个子表数据
+#foreach ($subTableInfo in $table.subTables)
+        insert${subTableInfo.subClassName}(${className});
+#end
+#end
 #end
         return ${className}Mapper.update${ClassName}(${className});
     }
@@ -111,15 +151,9 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service
      * @param ${pkColumn.javaField}s 需要删除的${functionName}主键
      * @return 结果
      */
-#if($table.sub)
-    @Transactional
-#end
     @Override
     public int delete${ClassName}By${pkColumn.capJavaField}s(${pkColumn.javaType}[] ${pkColumn.javaField}s)
     {
-#if($table.sub)
-        ${className}Mapper.delete${subClassName}By${subTableFkClassName}s(${pkColumn.javaField}s);
-#end
         return ${className}Mapper.delete${ClassName}By${pkColumn.capJavaField}s(${pkColumn.javaField}s);
     }
 
@@ -129,28 +163,42 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service
      * @param ${pkColumn.javaField} ${functionName}主键
      * @return 结果
      */
-#if($table.sub)
-    @Transactional
-#end
     @Override
     public int delete${ClassName}By${pkColumn.capJavaField}(${pkColumn.javaType} ${pkColumn.javaField})
     {
+        ${className}Mapper.delete${ClassName}By${pkColumn.capJavaField}(${pkColumn.javaField});
 #if($table.sub)
-        ${className}Mapper.delete${subClassName}By${subTableFkClassName}(${pkColumn.javaField});
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
 #end
-        return ${className}Mapper.delete${ClassName}By${pkColumn.capJavaField}(${pkColumn.javaField});
+#if($subTableType == 1)
+        return ${className}Mapper.delete${subClassName}By${subTableFkClassName}(${pkColumn.javaField});
+#elseif($subTableType == 2)
+        int result = 1;
+#foreach ($subTableInfo in $table.subTables)
+        result = ${className}Mapper.delete${subTableInfo.subClassName}By${subTableInfo.subTableFkClassName}(${pkColumn.javaField});
+#end
+        return result;
+#end
+#end
     }
-#if($table.sub)
 
+#if($table.sub)
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
     /**
-     * 新增${subTable.functionName}信息
+     * 新增${subTableName}信息
      * 
      * @param ${className} ${functionName}对象
      */
     public void insert${subClassName}(${ClassName} ${className})
     {
         List<${subClassName}> ${subclassName}List = ${className}.get${subClassName}List();
-        ${pkColumn.javaType} ${pkColumn.javaField} = ${className}.get${pkColumn.capJavaField}();
+        String ${pkColumn.javaField} = ${className}.get${pkColumn.capJavaField}();
         if (StringUtils.isNotNull(${subclassName}List))
         {
             List<${subClassName}> list = new ArrayList<${subClassName}>();
@@ -165,5 +213,32 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service
             }
         }
     }
+#elseif($subTableType == 2)
+#foreach ($subTableInfo in $table.subTables)
+    /**
+     * 新增${subTableInfo.subTableName}信息
+     * 
+     * @param ${className} ${functionName}对象
+     */
+    public void insert${subTableInfo.subClassName}(${ClassName} ${className})
+    {
+        List<${subTableInfo.subClassName}> ${subTableInfo.subclassName}List = ${className}.get${subTableInfo.subClassName}List();
+        String ${pkColumn.javaField} = ${className}.get${pkColumn.capJavaField}();
+        if (StringUtils.isNotNull(${subTableInfo.subclassName}List))
+        {
+            List<${subTableInfo.subClassName}> list = new ArrayList<${subTableInfo.subClassName}>();
+            for (${subTableInfo.subClassName} ${subTableInfo.subclassName} : ${subTableInfo.subclassName}List)
+            {
+                ${subTableInfo.subclassName}.set${subTableInfo.subTableFkClassName}(${pkColumn.javaField});
+                list.add(${subTableInfo.subclassName});
+            }
+            if (list.size() > 0)
+            {
+                ${className}Mapper.batch${subTableInfo.subClassName}(list);
+            }
+        }
+    }
+#end
+#end
 #end
 }

@@ -34,6 +34,18 @@ public class GenTable extends BaseEntity
     /** 本表关联父表的外键名 */
     private String subTableFkName;
 
+    /** 关联父表的表名集合（多个子表） */
+    private String subTableNames;
+
+    /** 本表关联父表的外键名集合（多个子表） */
+    private String subTableFkNames;
+
+    /** 子表信息列表（多个子表） */
+    private List<GenTable> subTables;
+
+    /** 子表关系类型（1一对一 2一对多） */
+    private Integer subTableType = 1;
+
     /** 实体类名称(首字母大写) */
     @NotBlank(message = "实体类名称不能为空")
     private String className;
@@ -146,6 +158,46 @@ public class GenTable extends BaseEntity
     public void setSubTableFkName(String subTableFkName)
     {
         this.subTableFkName = subTableFkName;
+    }
+
+    public String getSubTableNames()
+    {
+        return subTableNames;
+    }
+
+    public void setSubTableNames(String subTableNames)
+    {
+        this.subTableNames = subTableNames;
+    }
+
+    public String getSubTableFkNames()
+    {
+        return subTableFkNames;
+    }
+
+    public void setSubTableFkNames(String subTableFkNames)
+    {
+        this.subTableFkNames = subTableFkNames;
+    }
+
+    public List<GenTable> getSubTables()
+    {
+        return subTables;
+    }
+
+    public void setSubTables(List<GenTable> subTables)
+    {
+        this.subTables = subTables;
+    }
+
+    public Integer getSubTableType()
+    {
+        return subTableType;
+    }
+
+    public void setSubTableType(Integer subTableType)
+    {
+        this.subTableType = subTableType;
     }
 
     public String getClassName()

@@ -381,8 +381,19 @@ export default {
       // ${functionName}表格数据
       ${businessName}List: [],
 #if($table.sub)
-      // ${subTable.functionName}表格数据
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
+      // ${subTableName}数据
       ${subclassName}List: [],
+#elseif($subTableType == 2)
+#foreach ($subTableInfo in $table.subTables)
+      // ${subTableInfo.subTableName}数据
+      ${subTableInfo.subclassName}List: [],
+#end
+#end
 #end
       // 弹出层标题
       title: "",
@@ -520,77 +531,165 @@ export default {
         this.title = "修改${functionName}"
       })
     },
-    /** 提交按钮 */
-    submitForm() {
-      this.#[[$]]#refs["form"].validate(valid => {
-        if (valid) {
-#foreach ($column in $columns)
-#if($column.htmlType == "checkbox")
-          this.form.$column.javaField = this.form.${column.javaField}.join(",")
-#end
-#end
 #if($table.sub)
-          this.form.${subclassName}List = this.${subclassName}List
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
 #end
-          if (this.form.${pkColumn.javaField} != null) {
-            update${BusinessName}(this.form).then(response => {
-              this.#[[$modal]]#.msgSuccess("修改成功")
-              this.open = false
-              this.getList()
-            })
+#if($subTableType == 1)
+      // ${subTableName}序号
+      ${subclassName}Index: 0,
+#elseif($subTableType == 2)
+#foreach ($subTableInfo in $table.subTables)
+      // ${subTableInfo.subTableName}序号
+      ${subTableInfo.subclassName}Index: 0,
+#end
+#end
+#end
+
+#if($table.sub)
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
+    /** 初始化${subTableName}数据 */
+    get${subClassName}List() {
+      this.${subclassName}List = [];
+    },
+#elseif($subTableType == 2)
+#foreach ($subTableInfo in $table.subTables)
+    /** 初始化${subTableInfo.subTableName}数据 */
+    get${subTableInfo.subclassName}List() {
+      this.${subTableInfo.subclassName}List = [];
+    },
+#end
+#end
+
+#if($table.sub)
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
+    /** ${subTableName}添加按钮操作 */
+    handleAdd${subClassName}() {
+      let obj = {};
+#foreach ($column in $subTable.columns)
+      obj.${column.javaField} = "";
+#end
+      this.${subclassName}List.push(obj);
+    },
+    /** ${subTableName}删除按钮操作 */
+    handleDelete${subClassName}(index) {
+      this.${subclassName}List.splice(index, 1);
+    },
+    /** 复制对象 */
+    copyObj(obj) {
+      let newObj = {};
+      for (let key in obj) {
+        newObj[key] = obj[key];
+      }
+      return newObj;
+    },
+    /** ${subTableName}序号 */
+    get${subClassName}Index(index) {
+      this.${subclassName}Index = index;
+    },
+#elseif($subTableType == 2)
+#foreach ($subTableInfo in $table.subTables)
+    /** ${subTableInfo.subTableName}添加按钮操作 */
+    handleAdd${subTableInfo.subClassName}() {
+      let obj = {};
+#foreach ($column in $subTableInfo.columns)
+      obj.${column.javaField} = "";
+#end
+      this.${subTableInfo.subclassName}List.push(obj);
+    },
+    /** ${subTableInfo.subTableName}删除按钮操作 */
+    handleDelete${subTableInfo.subClassName}(index) {
+      this.${subTableInfo.subclassName}List.splice(index, 1);
+    },
+    /** 复制对象 */
+    copyObj(obj) {
+      let newObj = {};
+      for (let key in obj) {
+        newObj[key] = obj[key];
+      }
+      return newObj;
+    },
+    /** ${subTableInfo.subTableName}序号 */
+    get${subTableInfo.subClassName}Index(index) {
+      this.${subTableInfo.subclassName}Index = index;
+    },
+#end
+#end
+
+#if($table.sub)
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
+    /** 提交按钮 */
+    submitForm: function() {
+      this.$refs["form"].validate(valid => {
+        if (valid) {
+          this.form.${subclassName}List = this.${subclassName}List;
+          if (this.form.${pkColumn.javaField} != undefined) {
+            update${ClassName}(this.form).then(response => {
+              this.$modal.msgSuccess("修改成功");
+              this.open = false;
+              this.getList();
+            });
           } else {
-            add${BusinessName}(this.form).then(response => {
-              this.#[[$modal]]#.msgSuccess("新增成功")
-              this.open = false
-              this.getList()
-            })
+            add${ClassName}(this.form).then(response => {
+              this.$modal.msgSuccess("新增成功");
+              this.open = false;
+              this.getList();
+            });
           }
         }
-      })
+      });
     },
+#elseif($subTableType == 2)
+    /** 提交按钮 */
+    submitForm: function() {
+      this.$refs["form"].validate(valid => {
+        if (valid) {
+#foreach ($subTableInfo in $table.subTables)
+          this.form.${subTableInfo.subclassName}List = this.${subTableInfo.subclassName}List;
+#end
+          if (this.form.${pkColumn.javaField} != undefined) {
+            update${ClassName}(this.form).then(response => {
+              this.$modal.msgSuccess("修改成功");
+              this.open = false;
+              this.getList();
+            });
+          } else {
+            add${ClassName}(this.form).then(response => {
+              this.$modal.msgSuccess("新增成功");
+              this.open = false;
+              this.getList();
+            });
+          }
+        }
+      });
+    },
+#end
+#end
+
     /** 删除按钮操作 */
     handleDelete(row) {
       const ${pkColumn.javaField}s = row.${pkColumn.javaField} || this.ids
-      this.#[[$modal]]#.confirm('是否确认删除${functionName}编号为"' + ${pkColumn.javaField}s + '"的数据项？').then(function() {
+      this.$modal.confirm('是否确认删除${functionName}编号为"' + ${pkColumn.javaField}s + '"的数据项？').then(function() {
         return del${BusinessName}(${pkColumn.javaField}s)
       }).then(() => {
         this.getList()
-        this.#[[$modal]]#.msgSuccess("删除成功")
+        this.$modal.msgSuccess("删除成功")
       }).catch(() => {})
     },
-#if($table.sub)
-	/** ${subTable.functionName}序号 */
-    row${subClassName}Index({ row, rowIndex }) {
-      row.index = rowIndex + 1
-    },
-    /** ${subTable.functionName}添加按钮操作 */
-    handleAdd${subClassName}() {
-      let obj = {}
-#foreach($column in $subTable.columns)
-#if($column.pk || $column.javaField == ${subTableFkclassName})
-#elseif($column.list && "" != $javaField)
-      obj.$column.javaField = ""
-#end
-#end
-      this.${subclassName}List.push(obj)
-    },
-    /** ${subTable.functionName}删除按钮操作 */
-    handleDelete${subClassName}() {
-      if (this.checked${subClassName}.length == 0) {
-        this.#[[$modal]]#.msgError("请先选择要删除的${subTable.functionName}数据")
-      } else {
-        const ${subclassName}List = this.${subclassName}List
-        const checked${subClassName} = this.checked${subClassName}
-        this.${subclassName}List = ${subclassName}List.filter(function(item) {
-          return checked${subClassName}.indexOf(item.index) == -1
-        })
-      }
-    },
-    /** 复选框选中数据 */
-    handle${subClassName}SelectionChange(selection) {
-      this.checked${subClassName} = selection.map(item => item.index)
-    },
-#end
+
     /** 导出按钮操作 */
     handleExport() {
       this.download('${moduleName}/${businessName}/export', {

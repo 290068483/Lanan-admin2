@@ -1,16 +1,10 @@
 package ${packageName}.domain;
 
-#foreach ($import in $importList)
-import ${import};
-#end
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-import com.ruoyi.common.annotation.Excel;
-#if($table.crud || $table.sub)
+import java.util.Date;
+import java.util.List;
+import java.util.ArrayList;
 import com.ruoyi.common.core.domain.BaseEntity;
-#elseif($table.tree)
-import com.ruoyi.common.core.domain.TreeEntity;
-#end
+import com.ruoyi.common.annotation.Excel;
 
 /**
  * ${functionName}对象 ${tableName}
@@ -18,63 +12,123 @@ import com.ruoyi.common.core.domain.TreeEntity;
  * @author ${author}
  * @date ${datetime}
  */
-#if($table.crud || $table.sub)
-#set($Entity="BaseEntity")
-#elseif($table.tree)
-#set($Entity="TreeEntity")
-#end
-public class ${ClassName} extends ${Entity}
+public class ${ClassName} extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
 #foreach ($column in $columns)
-#if(!$table.isSuperColumn($column.javaField))
-    /** $column.columnComment */
-#if($column.list)
-#set($parentheseIndex=$column.columnComment.indexOf("（"))
-#if($parentheseIndex != -1)
-#set($comment=$column.columnComment.substring(0, $parentheseIndex))
+#if(${column.isSuperColumn()})
+    /** ${column.columnComment} */
+#set($dictType = "")
+#foreach ($subColumn in $subColumns)
+#if($subColumn.columnName == $column.columnName)
+#set($dictType = $subColumn.dictType)
+#end
+#end
+#if($column.htmlType == "select" || $column.htmlType == "radio" || $column.htmlType == "checkbox")
+#if($dictType != "" && $dictType)
+    @Excel(name = "${column.columnComment}", dictType = "$dictType", readConverterExp = "$column.javaField")
 #else
-#set($comment=$column.columnComment)
+    @Excel(name = "${column.columnComment}")
 #end
-#if($parentheseIndex != -1)
-    @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
-#elseif($column.javaType == 'Date')
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "${comment}", width = 30, dateFormat = "yyyy-MM-dd")
 #else
-    @Excel(name = "${comment}")
+    @Excel(name = "${column.columnComment}")
 #end
+    private ${column.javaType} ${column.javaField};
 #end
-    private $column.javaType $column.javaField;
 
 #end
-#end
+
 #if($table.sub)
-    /** $table.subTable.functionName信息 */
-    private List<${subClassName}> ${subclassName}List;
-
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
 #end
+#if($subTableType == 1)
+    /** $subTableName表 */
+    private ${subClassName} ${subclassName};
+
+    /** $subTableName集合 */
+    private List<${subClassName}> ${subclassName}List = new ArrayList<${subClassName}>();
+    
+#elseif($subTableType == 2)
+    /** 多个子表集合 */
+#foreach ($subTableInfo in $table.subTables)
+    private List<${subTableInfo.subClassName}> ${subTableInfo.subclassName}List = new ArrayList<${subTableInfo.subClassName}>();
+#end
+    
+#end
+#end
+
 #foreach ($column in $columns)
-#if(!$table.isSuperColumn($column.javaField))
-#if($column.javaField.length() > 2 && $column.javaField.substring(1,2).matches("[A-Z]"))
-#set($AttrName=$column.javaField)
+#if(!$column.isSuperColumn())
+    /** ${column.columnComment} */
+#set($dictType = "")
+#foreach ($subColumn in $subColumns)
+#if($subColumn.columnName == $column.columnName)
+#set($dictType = $subColumn.dictType)
+#end
+#end
+#if($column.htmlType == "select" || $column.htmlType == "radio" || $column.htmlType == "checkbox")
+#if($dictType != "" && $dictType)
+    @Excel(name = "${column.columnComment}", dictType = "$dictType", readConverterExp = "$column.javaField")
 #else
-#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+    @Excel(name = "${column.columnComment}")
 #end
-    public void set${AttrName}($column.javaType $column.javaField) 
-    {
-        this.$column.javaField = $column.javaField;
-    }
-
-    public $column.javaType get${AttrName}() 
-    {
-        return $column.javaField;
-    }
+#else
+    @Excel(name = "${column.columnComment}")
+#end
+    private ${column.javaType} ${column.javaField};
+#end
 
 #end
+
+#foreach ($column in $columns)
+#if(${column.isSuperColumn()})
+    public ${column.javaType} get${column.capJavaField}()
+    {
+        return ${column.javaField};
+    }
+
+    public void set${column.capJavaField}(${column.javaType} ${column.javaField})
+    {
+        this.${column.javaField} = ${column.javaField};
+    }
 #end
+
+#end
+
+#foreach ($column in $columns)
+#if(!$column.isSuperColumn())
+    public ${column.javaType} get${column.capJavaField}()
+    {
+        return ${column.javaField};
+    }
+
+    public void set${column.capJavaField}(${column.javaType} ${column.javaField})
+    {
+        this.${column.javaField} = ${column.javaField};
+    }
+#end
+
+#end
+
 #if($table.sub)
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
+    public ${subClassName} get${subClassName}()
+    {
+        return ${subclassName};
+    }
+
+    public void set${subClassName}(${subClassName} ${subclassName})
+    {
+        this.${subclassName} = ${subclassName};
+    }
+
     public List<${subClassName}> get${subClassName}List()
     {
         return ${subclassName}List;
@@ -84,22 +138,20 @@ public class ${ClassName} extends ${Entity}
     {
         this.${subclassName}List = ${subclassName}List;
     }
-
-#end
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-#foreach ($column in $columns)
-#if($column.javaField.length() > 2 && $column.javaField.substring(1,2).matches("[A-Z]"))
-#set($AttrName=$column.javaField)
-#else
-#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-#end
-            .append("${column.javaField}", get${AttrName}())
-#end
-#if($table.sub)
-            .append("${subclassName}List", get${subClassName}List())
-#end
-            .toString();
+    
+#elseif($subTableType == 2)
+#foreach ($subTableInfo in $table.subTables)
+    public List<${subTableInfo.subClassName}> get${subTableInfo.subClassName}List()
+    {
+        return ${subTableInfo.subclassName}List;
     }
+
+    public void set${subTableInfo.subClassName}List(List<${subTableInfo.subClassName}> ${subTableInfo.subclassName}List)
+    {
+        this.${subTableInfo.subclassName}List = ${subTableInfo.subclassName}List;
+    }
+#end
+    
+#end
+#end
 }

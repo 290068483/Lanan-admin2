@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -481,10 +482,35 @@ public class GenTableServiceImpl implements IGenTableService
      */
     public void setSubTable(GenTable table)
     {
-        String subTableName = table.getSubTableName();
-        if (StringUtils.isNotEmpty(subTableName))
-        {
-            table.setSubTable(genTableMapper.selectGenTableByName(subTableName));
+        // 根据subTableType决定如何处理子表
+        Integer subTableType = table.getSubTableType();
+        if (subTableType == null) {
+            subTableType = 1; // 默认为一对一
+        }
+        
+        if (subTableType == 1) {
+            // 一对一关系，保持原有处理方式
+            String subTableName = table.getSubTableName();
+            if (StringUtils.isNotEmpty(subTableName))
+            {
+                table.setSubTable(genTableMapper.selectGenTableByName(subTableName));
+            }
+        } else if (subTableType == 2) {
+            // 一对多关系，处理多个子表
+            String subTableNames = table.getSubTableNames();
+            if (StringUtils.isNotEmpty(subTableNames))
+            {
+                String[] tableNames = subTableNames.split(",");
+                List<GenTable> subTables = new ArrayList<>();
+                for (String name : tableNames)
+                {
+                    if (StringUtils.isNotEmpty(name))
+                    {
+                        subTables.add(genTableMapper.selectGenTableByName(name.trim()));
+                    }
+                }
+                table.setSubTables(subTables);
+            }
         }
     }
 
