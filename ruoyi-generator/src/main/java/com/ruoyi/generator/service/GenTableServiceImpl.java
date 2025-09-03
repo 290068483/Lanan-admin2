@@ -460,17 +460,21 @@ public class GenTableServiceImpl implements IGenTableService
         }
         if (GenConstants.TPL_SUB.equals(table.getTplCategory()))
         {
-            for (GenTableColumn column : table.getSubTable().getColumns())
+            GenTable subTable = table.getSubTable();
+            if (StringUtils.isNotNull(subTable))
             {
-                if (column.isPk())
+                for (GenTableColumn column : subTable.getColumns())
                 {
-                    table.getSubTable().setPkColumn(column);
-                    break;
+                    if (column.isPk())
+                    {
+                        subTable.setPkColumn(column);
+                        break;
+                    }
                 }
-            }
-            if (StringUtils.isNull(table.getSubTable().getPkColumn()))
-            {
-                table.getSubTable().setPkColumn(table.getSubTable().getColumns().get(0));
+                if (StringUtils.isNull(subTable.getPkColumn()))
+                {
+                    subTable.setPkColumn(subTable.getColumns().get(0));
+                }
             }
         }
     }

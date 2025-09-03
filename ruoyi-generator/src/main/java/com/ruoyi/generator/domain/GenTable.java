@@ -1,5 +1,6 @@
 package com.ruoyi.generator.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -7,6 +8,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import com.ruoyi.common.constant.GenConstants;
 import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.common.utils.StringUtils;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 业务表 gen_table
@@ -44,6 +46,7 @@ public class GenTable extends BaseEntity
     private List<GenTable> subTables;
 
     /** 子表关系类型（1一对一 2一对多） */
+    @JsonProperty("subTableType")
     private Integer subTableType = 1;
 
     /** 实体类名称(首字母大写) */
@@ -148,6 +151,10 @@ public class GenTable extends BaseEntity
     public void setSubTableName(String subTableName)
     {
         this.subTableName = subTableName;
+        // 当subTableName为空时，同时清空subTable
+        if (StringUtils.isEmpty(subTableName)) {
+            this.subTable = null;
+        }
     }
 
     public String getSubTableFkName()
@@ -168,6 +175,10 @@ public class GenTable extends BaseEntity
     public void setSubTableNames(String subTableNames)
     {
         this.subTableNames = subTableNames;
+        // 当subTableNames为空时，同时清空subTables
+        if (StringUtils.isEmpty(subTableNames)) {
+            this.subTables = new ArrayList<>();
+        }
     }
 
     public String getSubTableFkNames()
@@ -190,6 +201,7 @@ public class GenTable extends BaseEntity
         this.subTables = subTables;
     }
 
+    @JsonProperty("subTableType")
     public Integer getSubTableType()
     {
         return subTableType;
@@ -198,6 +210,15 @@ public class GenTable extends BaseEntity
     public void setSubTableType(Integer subTableType)
     {
         this.subTableType = subTableType;
+        // 当subTableType切换为1时，清空subTables并设置subTable为null
+        if (subTableType != null && subTableType == 1) {
+            this.subTables = new ArrayList<>();
+            this.subTable = null;
+        }
+        // 当subTableType切换为2时，清空subTable
+        if (subTableType != null && subTableType == 2) {
+            this.subTable = null;
+        }
     }
 
     public String getClassName()

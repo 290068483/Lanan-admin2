@@ -1,272 +1,236 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="${packageName}.mapper.${ClassName}Mapper">
-    
+
+    <!-- 1. 主表 ResultMap（含子表关联） -->
     <resultMap type="${ClassName}" id="${ClassName}Result">
-#foreach ($column in $columns)
-#if($column.pk)
-        <id     property="${column.javaField}"    column="${column.columnName}"      />
-#else
-        <result property="${column.javaField}"    column="${column.columnName}"      />
-#end
-#end
-#if($table.sub)
-#set($subTableType = $table.subTableType)
-#if(!$subTableType)
-#set($subTableType = 1)
-#end
-#if($subTableType == 1)
-        <collection  property="${subclassName}List"  javaType="java.util.List"  resultMap="${subClassName}Result" />
-#elseif($subTableType == 2)
-#foreach ($subTableInfo in $table.subTables)
-        <collection  property="${subTableInfo.subclassName}List"  javaType="java.util.List"  resultMap="${subTableInfo.subClassName}Result" />
-#end
-#end
-#end
+        #foreach ($column in $columns)
+            #if($column.pk)
+                <id property="${column.javaField}" column="${column.columnName}" />
+            #else
+                <result property="${column.javaField}" column="${column.columnName}" />
+            #end
+        #end
+        <!-- 子表关联（Collection） -->
+        #if($table.sub)
+            #set($subTableType = $table.subTableType)
+            #if(!$subTableType)#set($subTableType = 1)#end
+            #if($subTableType == 1)
+                <collection property="${subclassName}List" javaType="java.util.List" resultMap="${subClassName}Result" />
+            #elseif($subTableType == 2)
+                #foreach ($subTableInfo in $table.subTables)
+                    <collection property="${subTableInfo.subclassName}List" javaType="java.util.List" resultMap="${subTableInfo.subClassName}Result" />
+                #end
+            #end
+        #end
     </resultMap>
-    
-#if($table.sub)
-#set($subTableType = $table.subTableType)
-#if(!$subTableType)
-#set($subTableType = 1)
-#end
-#if($subTableType == 1)
-    <resultMap type="${subClassName}" id="${subClassName}Result">
-#foreach ($column in $subTable.columns)
-#if($column.pk)
-        <id     property="${column.javaField}"    column="${column.columnName}"      />
-#else
-        <result property="${column.javaField}"    column="${column.columnName}"      />
-#end
-#end
-    </resultMap>
-#elseif($subTableType == 2)
-#foreach ($subTableInfo in $table.subTables)
-    <resultMap type="${subTableInfo.subClassName}" id="${subTableInfo.subClassName}Result">
-#foreach ($column in $subTableInfo.columns)
-#if($column.pk)
-        <id     property="${column.javaField}"    column="${column.columnName}"      />
-#else
-        <result property="${column.javaField}"    column="${column.columnName}"      />
-#end
-#end
-    </resultMap>
-#end
-#end
-#end
-    
+
+    <!-- 2. 子表 ResultMap（按需生成） -->
+    #if($table.sub)
+        #set($subTableType = $table.subTableType)
+        #if(!$subTableType)#set($subTableType = 1)#end
+        #if($subTableType == 1)
+            <resultMap type="${subClassName}" id="${subClassName}Result">
+                #foreach ($column in $subTable.columns)
+                    #if($column.pk)
+                        <id property="${column.javaField}" column="${column.columnName}" />
+                    #else
+                        <result property="${column.javaField}" column="${column.columnName}" />
+                    #end
+                #end
+            </resultMap>
+        #elseif($subTableType == 2)
+            #foreach ($subTableInfo in $table.subTables)
+                <resultMap type="${subTableInfo.subClassName}" id="${subTableInfo.subClassName}Result">
+                    #foreach ($column in $subTableInfo.columns)
+                        #if($column.pk)
+                            <id property="${column.javaField}" column="${column.columnName}" />
+                        #else
+                            <result property="${column.javaField}" column="${column.columnName}" />
+                        #end
+                    #end
+                </resultMap>
+            #end
+        #end
+    #end
+
+    <!-- 3. 主表字段 SQL 片段 -->
     <sql id="${className}Vo">
-#foreach ($column in $columns)
-        ${column.columnName},
-#end
+        #foreach ($column in $columns)
+            ${column.columnName}#if($column_has_next),#end  <!-- 修复：用 has_next 避免末尾多余逗号 -->
+        #end
     </sql>
-    
-#if($table.sub)
-#set($subTableType = $table.subTableType)
-#if(!$subTableType)
-#set($subTableType = 1)
-#end
-#if($subTableType == 1)
-    <sql id="${subclassName}Vo">
-#foreach ($column in $subTable.columns)
-        t.${column.columnName},
-#end
-    </sql>
-#elseif($subTableType == 2)
-#foreach ($subTableInfo in $table.subTables)
-    <sql id="${subTableInfo.subclassName}Vo">
-#foreach ($column in $subTableInfo.columns)
-        t${subTableInfo_index}.${column.columnName},
-#end
-    </sql>
-#end
-#end
-#end
-    
+
+    <!-- 4. 子表字段 SQL 片段（按需生成） -->
+    #if($table.sub)
+        #set($subTableType = $table.subTableType)
+        #if(!$subTableType)#set($subTableType = 1)#end
+        #if($subTableType == 1)
+            <sql id="${subclassName}Vo">
+                #foreach ($column in $subTable.columns)
+                    t.${column.columnName}#if($column_has_next),#end  <!-- 修复：避免末尾多余逗号 -->
+                #end
+            </sql>
+        #elseif($subTableType == 2)
+            #foreach ($subTableInfo in $table.subTables)
+                <sql id="${subTableInfo.subclassName}Vo">
+                    #foreach ($column in $subTableInfo.columns)
+                        t${subTableInfo_index}.${column.columnName}#if($column_has_next),#end  <!-- 修复：避免末尾多余逗号 -->
+                    #end
+                </sql>
+            #end
+        #end
+    #end
+
+    <!-- 5. 列表查询（修复：子表字段拼接逻辑） -->
     <select id="select${ClassName}List" parameterType="${ClassName}" resultMap="${ClassName}Result">
-        SELECT 
+        SELECT
         <include refid="${className}Vo" />
-#if($table.sub)
-#set($subTableType = $table.subTableType)
-#if(!$subTableType)
-#set($subTableType = 1)
-#end
-#if($subTableType == 1)
-        t.${subTableFkName}
-#end
-#end
+        #if($table.sub && $subTableType == 1)  <!-- 修复：复用已定义的 subTableType，避免重复赋值 -->
+            , t.${subTableFkName}  <!-- 修复：添加逗号，避免 SQL 语法错误 -->
+        #end
         FROM ${tableName}
-#if($table.sub)
-#set($subTableType = $table.subTableType)
-#if(!$subTableType)
-#set($subTableType = 1)
-#end
-#if($subTableType == 1)
-        LEFT JOIN ${subTableName} t ON ${tableName}.${subTableFkName} = t.${subTableFkName}
-#end
-#end
+        #if($table.sub && $subTableType == 1)
+            LEFT JOIN ${subTableName} t ON ${tableName}.${subTableFkName} = t.${subTableFkName}
+        #end
     </select>
-    
+
+    <!-- 6. 单条查询（修复：重复 ID 问题，删除重复的 select 标签） -->
     <select id="select${ClassName}By${pkColumn.capJavaField}" parameterType="${pkColumn.javaType}" resultMap="${ClassName}Result">
-        SELECT 
-        <include refid="${className}Vo"/>
-#if($table.sub)
-#set($subTableType = $table.subTableType)
-#if(!$subTableType)
-#set($subTableType = 1)
-#end
-#if($subTableType == 1)
-        t.${subTableFkName}
-#end
-#end
+        SELECT
+        <include refid="${className}Vo" />
+        #if($table.sub && $subTableType == 1)
+            , t.${subTableFkName}  <!-- 修复：添加逗号，避免 SQL 语法错误 -->
+        #end
         FROM ${tableName}
-#if($table.sub)
-#set($subTableType = $table.subTableType)
-#if(!$subTableType)
-#set($subTableType = 1)
-#end
-#if($subTableType == 1)
-        LEFT JOIN ${subTableName} t ON ${tableName}.${subTableFkName} = t.${subTableFkName}
-#end
-#end
-        WHERE ${tableName}.${pkColumn.columnName} = ${r'#{'}${pkColumn.javaField}${r'}'}
+        #if($table.sub && $subTableType == 1)
+            LEFT JOIN ${subTableName} t ON ${tableName}.${subTableFkName} = t.${subTableFkName}
+        #end
+        WHERE ${tableName}.${pkColumn.columnName} = #{${pkColumn.javaField}}
     </select>
-        
+
+    <!-- 7. 新增（修复：主键判断逻辑、子表外键过滤） -->
     <insert id="insert${ClassName}" parameterType="${ClassName}" useGeneratedKeys="true" keyProperty="${pkColumn.javaField}">
         INSERT INTO ${tableName}
         <trim prefix="(" suffix=")" suffixOverrides=",">
-#foreach ($column in $columns)
-#if($column.pk)
-#if($column.javaField != 'id' && $column.javaType == 'Integer')
-            ${column.columnName},
-#end
-#elseif($column.columnName != $subTableFkName!)
-#if($column.javaField)
-            <if test="${column.javaField} != null${r'${'}$column.javaType == 'String' ? ' and ' + $column.javaField + ' != \'\'': ''}">
-                ${column.columnName},
-            </if>
-#end
-#end
-#end
+            #foreach ($column in $columns)
+                #if($column.pk)
+                    <!-- 修复：主键判断逻辑（仅排除非自增主键） -->
+                    #if($column.javaField != "id" && $column.javaType == "Integer")
+                        ${column.columnName},
+                    #end
+                #elseif($column.columnName != $subTableFkName && $column.javaField)  <!-- 修复：增加 javaField 非空判断 -->
+                    <if test="${column.javaField} != null and ${column.javaField} != ''">
+                        ${column.columnName},
+                    </if>
+                #end
+            #end
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-#foreach ($column in $columns)
-#if($column.pk)
-#if($column.javaField != 'id' && $column.javaType == 'Integer')
-            ${r'#{'}${column.javaField}${r'}'},
-#end
-#elseif($column.columnName != $subTableFkName!)
-#if($column.javaField)
-            <if test="${column.javaField} != null${r'${'}$column.javaType == 'String' ? ' and ' + $column.javaField + ' != \'\'': ''}">
-                ${r'#{'}${column.javaField}${r'}'},
-            </if>
-#end
-#end
-#end
+            #foreach ($column in $columns)
+                #if($column.pk)
+                    #if($column.javaField != "id" && $column.javaType == "Integer")
+                        #{${column.javaField}},
+                    #end
+                #elseif($column.columnName != $subTableFkName && $column.javaField)
+                    <if test="${column.javaField} != null and ${column.javaField} != ''">
+                        #{${column.javaField}},
+                    </if>
+                #end
+            #end
         </trim>
     </insert>
-	 
+
+    <!-- 8. 更新（修复：子表外键过滤、javaField 非空判断） -->
     <update id="update${ClassName}" parameterType="${ClassName}">
         UPDATE ${tableName}
         <set>
-#foreach ($column in $columns)
-#if(!$column.pk && $column.columnName != $subTableFkName!)
-#if($column.javaField)
-            <if test="${column.javaField} != null${r'${'}$column.javaType == 'String' ? ' and ' + $column.javaField + ' != \'\'': ''}">
-                ${column.columnName} = ${r'#{'}${column.javaField}${r'}'},
-            </if>
-#end
-#end
-#end
+            #foreach ($column in $columns)
+                #if(!$column.pk && $column.columnName != $subTableFkName && $column.javaField)  <!-- 修复：增加 javaField 非空判断 -->
+                    <if test="${column.javaField} != null and ${column.javaField} != ''">
+                        ${column.columnName} = #{${column.javaField}},
+                    </if>
+                #end
+            #end
         </set>
-        WHERE ${pkColumn.columnName} = ${r'#{'}${pkColumn.javaField}${r'}'}
+        WHERE ${pkColumn.columnName} = #{${pkColumn.javaField}}
     </update>
-	
+
+    <!-- 9. 单条删除 -->
     <delete id="delete${ClassName}By${pkColumn.capJavaField}" parameterType="${pkColumn.javaType}">
-        DELETE FROM ${tableName} WHERE ${pkColumn.columnName} = ${r'#{'}${pkColumn.javaField}${r'}'}
+        DELETE FROM ${tableName} WHERE ${pkColumn.columnName} = #{${pkColumn.javaField}}
     </delete>
-    
+
+    <!-- 10. 批量删除（修复：foreach item 命名，避免与参数名冲突） -->
     <delete id="delete${ClassName}By${pkColumn.capJavaField}s" parameterType="String">
-        DELETE FROM ${tableName} WHERE ${pkColumn.columnName} IN 
-        <foreach item="${pkColumn.javaField}" collection="array" open="(" separator="," close=")">
-             ${r'#{'}${pkColumn.javaField}${r'}'}
+        DELETE FROM ${tableName} WHERE ${pkColumn.columnName} IN
+        <foreach item="item" collection="array" open="(" separator="," close=")">
+            #{item}  <!-- 修复：item 用通用名，避免与 pkColumn.javaField 冲突 -->
         </foreach>
     </delete>
-    
-#if($table.sub)
-#set($subTableType = $table.subTableType)
-#if(!$subTableType)
-#set($subTableType = 1)
-#end
-#if($subTableType == 1)
-    <select id="select${ClassName}By${pkColumn.capJavaField}" parameterType="${pkColumn.javaType}" resultMap="${ClassName}Result">
-        SELECT a.${pkColumn.columnName},
-#foreach ($column in $columns)
-#if($column.columnName != $pkColumn.columnName)
-        a.${column.columnName},
-#end
-#end
-        <include refid="${subclassName}Vo"/>
-        FROM ${tableName} a
-        LEFT JOIN ${subTableName} t ON t.${subTableFkName} = a.${pkColumn.columnName}
-        WHERE a.${pkColumn.columnName} = ${r'#{'}${pkColumn.javaField}${r'}'}
-    </select>
-    
-    <delete id="delete${subClassName}By${subTableFkClassName}" parameterType="${pkColumn.javaType}">
-        DELETE FROM ${subTableName} WHERE ${subTableFkName} = ${r'#{'}${pkColumn.javaField}${r'}'}
-    </delete>
-    
-    <delete id="delete${subClassName}By${subTableFkClassName}s" parameterType="String">
-        DELETE FROM ${subTableName} WHERE ${subTableFkName} IN 
-        <foreach item="${pkColumn.javaField}" collection="array" open="(" separator="," close=")">
-             ${r'#{'}${pkColumn.javaField}${r'}'}
-        </foreach>
-    </delete>
-    
-    <insert id="batch${subClassName}">
-        INSERT INTO ${subTableName}(
-#foreach ($column in $subTable.columns)
-        ${column.columnName}<#if $column_has_next>,</#if>
-#end
-        ) VALUES
-        <foreach item="item" collection="list" separator=",">
-        (
-#foreach ($column in $subTable.columns)
-        ${r'#{item.'}${column.javaField}${r'}'}<#if $column_has_next>,</#if>
-#end
-        )
-        </foreach>
-    </insert>
-#elseif($subTableType == 2)
-#foreach ($subTableInfo in $table.subTables)
-    <delete id="delete${subTableInfo.subClassName}By${subTableInfo.subTableFkClassName}" parameterType="${pkColumn.javaType}">
-        DELETE FROM ${subTableInfo.subTableName} WHERE ${subTableInfo.subTableFkName} = ${r'#{'}${pkColumn.javaField}${r'}'}
-    </delete>
-    
-    <delete id="delete${subTableInfo.subClassName}By${subTableInfo.subTableFkClassName}s" parameterType="String">
-        DELETE FROM ${subTableInfo.subTableName} WHERE ${subTableInfo.subTableFkName} IN 
-        <foreach item="${pkColumn.javaField}" collection="array" open="(" separator="," close=")">
-             ${r'#{'}${pkColumn.javaField}${r'}'}
-        </foreach>
-    </delete>
-    
-    <insert id="batch${subTableInfo.subClassName}">
-        INSERT INTO ${subTableInfo.subTableName}(
-#foreach ($column in $subTableInfo.columns)
-        ${column.columnName}<#if $column_has_next>,</#if>
-#end
-        ) VALUES
-        <foreach item="item" collection="list" separator=",">
-        (
-#foreach ($column in $subTableInfo.columns)
-        ${r'#{item.'}${column.javaField}${r'}'}<#if $column_has_next>,</#if>
-#end
-        )
-        </foreach>
-    </insert>
-#end
-#end
-#end
+
+    <!-- 11. 子表操作（按需生成，修复：批量插入字段逗号问题） -->
+    #if($table.sub)
+        #set($subTableType = $table.subTableType)
+        #if(!$subTableType)#set($subTableType = 1)#end
+        #if($subTableType == 1)
+            <!-- 子表单条删除 -->
+            <delete id="delete${subClassName}By${subTableFkClassName}" parameterType="${pkColumn.javaType}">
+                DELETE FROM ${subTableName} WHERE ${subTableFkName} = #{${pkColumn.javaField}}
+            </delete>
+            <!-- 子表批量删除 -->
+            <delete id="delete${subClassName}By${subTableFkClassName}s" parameterType="String">
+                DELETE FROM ${subTableName} WHERE ${subTableFkName} IN
+                <foreach item="item" collection="array" open="(" separator="," close=")">
+                    #{item}  <!-- 修复：item 命名冲突 -->
+                </foreach>
+            </delete>
+            <!-- 子表批量插入（修复：字段逗号问题） -->
+            <insert id="batch${subClassName}">
+                INSERT INTO ${subTableName}(
+                #foreach ($column in $subTable.columns)
+                    ${column.columnName}#if($column_has_next),#end
+                #end
+                ) VALUES
+                <foreach item="item" collection="list" separator=",">
+                    (
+                    #foreach ($column in $subTable.columns)
+                        #{item.${column.javaField}}#if($column_has_next),#end
+                    #end
+                    )
+                </foreach>
+            </insert>
+        #elseif($subTableType == 2)
+            #foreach ($subTableInfo in $table.subTables)
+                <!-- 多子表单条删除 -->
+                <delete id="delete${subTableInfo.subClassName}By${subTableInfo.subTableFkClassName}" parameterType="${pkColumn.javaType}">
+                    DELETE FROM ${subTableInfo.subTableName} WHERE ${subTableInfo.subTableFkName} = #{${pkColumn.javaField}}
+                </delete>
+                <!-- 多子表批量删除 -->
+                <delete id="delete${subTableInfo.subClassName}By${subTableInfo.subTableFkClassName}s" parameterType="String">
+                    DELETE FROM ${subTableInfo.subTableName} WHERE ${subTableInfo.subTableFkName} IN
+                    <foreach item="item" collection="array" open="(" separator="," close=")">
+                        #{item}  <!-- 修复：item 命名冲突 -->
+                    </foreach>
+                </delete>
+                <!-- 多子表批量插入（修复：字段逗号问题） -->
+                <insert id="batch${subTableInfo.subClassName}">
+                    INSERT INTO ${subTableInfo.subTableName}(
+                    #foreach ($column in $subTableInfo.columns)
+                        ${column.columnName}#if($column_has_next),#end
+                    #end
+                    ) VALUES
+                    <foreach item="item" collection="list" separator=",">
+                        (
+                        #foreach ($column in $subTableInfo.columns)
+                            #{item.${column.javaField}}#if($column_has_next),#end
+                        #end
+                        )
+                    </foreach>
+                </insert>
+            #end
+        #end
+    #end
 </mapper>

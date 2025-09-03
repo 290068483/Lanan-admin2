@@ -269,6 +269,11 @@
 #end
 #if($table.sub)
         <el-divider content-position="center">${subTable.functionName}信息</el-divider>
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
         <el-row :gutter="10" class="mb8">
           <el-col :span="1.5">
             <el-button type="primary" icon="Plus" @click="handleAdd${subClassName}">添加</el-button>
@@ -292,14 +297,14 @@
 #elseif($column.list && $column.htmlType == "input")
           <el-table-column label="$comment" prop="${javaField}" width="150">
             <template #default="scope">
-              <el-input v-model="scope.row.$javaField" placeholder="请输入$comment" />
+              <el-input v-model="scope.row.${javaField}" placeholder="请输入$comment" />
             </template>
           </el-table-column>
 #elseif($column.list && $column.htmlType == "datetime")
           <el-table-column label="$comment" prop="${javaField}" width="240">
             <template #default="scope">
               <el-date-picker clearable
-                v-model="scope.row.$javaField"
+                v-model="scope.row.${javaField}"
                 type="date"
                 value-format="YYYY-MM-DD"
                 placeholder="请选择$comment">
@@ -309,7 +314,71 @@
 #elseif($column.list && ($column.htmlType == "select" || $column.htmlType == "radio") && "" != $column.dictType)
           <el-table-column label="$comment" prop="${javaField}" width="150">
             <template #default="scope">
+              <el-select v-model="scope.row.${javaField}" placeholder="请选择$comment">
+                <el-option
+                  v-for="dict in $column.dictType"
+                  :key="dict.value"
+                  :label="dict.label"
+                  :value="dict.value"
+                ></el-option>
+              </el-select>
+            </template>
+          </el-table-column>
+#elseif($column.list && ($column.htmlType == "select" || $column.htmlType == "radio") && "" == $column.dictType)
+          <el-table-column label="$comment" prop="${javaField}" width="150">
+            <template #default="scope">
               <el-select v-model="scope.row.$javaField" placeholder="请选择$comment">
+                <el-option label="请选择字典生成" value="" />
+              </el-select>
+            </template>
+          </el-table-column>
+#end
+#end
+        </el-table>
+#elseif($subTableType == 2)
+#foreach ($subTableInfo in $table.subTables)
+        <el-divider content-position="center">${subTableInfo.subTable.functionName}信息</el-divider>
+        <el-row :gutter="10" class="mb8">
+          <el-col :span="1.5">
+            <el-button type="primary" icon="Plus" @click="handleAdd${subTableInfo.subClassName}">添加</el-button>
+          </el-col>
+          <el-col :span="1.5">
+            <el-button type="danger" icon="Delete" @click="handleDelete${subTableInfo.subClassName}">删除</el-button>
+          </el-col>
+        </el-row>
+        <el-table :data="${subTableInfo.subclassName}List" :row-class-name="row${subTableInfo.subClassName}Index" @selection-change="handle${subTableInfo.subClassName}SelectionChange" ref="${subTableInfo.subclassName}">
+          <el-table-column type="selection" width="50" align="center" />
+          <el-table-column label="序号" align="center" prop="index" width="50"/>
+#foreach($column in $subTableInfo.subTable.columns)
+#set($javaField=$column.javaField)
+#set($parentheseIndex=$column.columnComment.indexOf("（"))
+#if($parentheseIndex != -1)
+#set($comment=$column.columnComment.substring(0, $parentheseIndex))
+#else
+#set($comment=$column.columnComment)
+#end
+#if($column.pk || $javaField == ${subTableInfo.subTableFkclassName})
+#elseif($column.list && $column.htmlType == "input")
+          <el-table-column label="$comment" prop="${javaField}" width="150">
+            <template #default="scope">
+              <el-input v-model="scope.row.${javaField}" placeholder="请输入$comment" />
+            </template>
+          </el-table-column>
+#elseif($column.list && $column.htmlType == "datetime")
+          <el-table-column label="$comment" prop="${javaField}" width="240">
+            <template #default="scope">
+              <el-date-picker clearable
+                v-model="scope.row.${javaField}"
+                type="date"
+                value-format="YYYY-MM-DD"
+                placeholder="请选择$comment">
+              </el-date-picker>
+            </template>
+          </el-table-column>
+#elseif($column.list && ($column.htmlType == "select" || $column.htmlType == "radio") && "" != $column.dictType)
+          <el-table-column label="$comment" prop="${javaField}" width="150">
+            <template #default="scope">
+              <el-select v-model="scope.row.${javaField}" placeholder="请选择$comment">
                 <el-option
                   v-for="dict in $column.dictType"
                   :key="dict.value"
@@ -331,6 +400,7 @@
 #end
         </el-table>
 #end
+#end
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -351,76 +421,177 @@ const { proxy } = getCurrentInstance()
 const { ${dictsNoSymbol} } = proxy.useDict(${dicts})
 #end
 
-const ${businessName}List = ref([])
-#if($table.sub)
-const ${subclassName}List = ref([])
+const state = reactive({
+  // 表格数据
+  loading: true,
+  showSearch: true,
+  // 选中子表数据
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
 #end
-const open = ref(false)
-const loading = ref(true)
-const showSearch = ref(true)
-const ids = ref([])
-#if($table.sub)
-const checked${subClassName} = ref([])
-#end
-const single = ref(true)
-const multiple = ref(true)
-const total = ref(0)
-const title = ref("")
-#foreach ($column in $columns)
-#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
-#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-const daterange${AttrName} = ref([])
+#if($subTableType == 1)
+  checked${subClassName}: [],
+#elseif($subTableType == 2)
+#foreach ($subTableInfo in $table.subTables)
+  checked${subTableInfo.subClassName}: [],
 #end
 #end
-
-const data = reactive({
+  // 子表数据
+#if($subTableType == 1)
+  ${subclassName}List: [],
+#elseif($subTableType == 2)
+#foreach ($subTableInfo in $table.subTables)
+  ${subTableInfo.subclassName}List: [],
+#end
+#end
+  // 表单参数
   form: {},
+  // 查询参数
   queryParams: {
-    pageNum: 1,
-    pageSize: 10,
-    #foreach ($column in $columns)
-#if($column.query)
-    $column.javaField: null#if($foreach.count != $columns.size()),#end
+#foreach($column in $columns)
+#if($column.javaField == ${tableFkclassName})
+    ${column.javaField}: undefined,
+#elseif($column.queryType == "EQ")
+    ${column.javaField}: undefined,
+#elseif($column.queryType == "LIKE")
+    ${column.javaField}: undefined,
+#elseif($column.queryType == "BETWEEN")
+    ${column.javaField}: undefined,
 #end
 #end
   },
+  // 表单校验
   rules: {
-    #foreach ($column in $columns)
-#if($column.required)
-#set($parentheseIndex=$column.columnComment.indexOf("（"))
-#if($parentheseIndex != -1)
-#set($comment=$column.columnComment.substring(0, $parentheseIndex))
-#else
-#set($comment=$column.columnComment)
-#end
-    $column.javaField: [
-      { required: true, message: "$comment不能为空", trigger: #if($column.htmlType == "select" || $column.htmlType == "radio")"change"#else"blur"#end }
-    ]#if($foreach.count != $columns.size()),#end
+#foreach($column in $columns)
+#if($column.isRequired)
+    ${column.javaField}: [
+      { required: true, message: "$column.columnComment 不能为空", trigger: "blur" }
+    ],
 #end
 #end
   }
-})
+});
 
-const { queryParams, form, rules } = toRefs(data)
+const { 
+  data, 
+  loading, 
+  showSearch, 
+  ids, 
+  form, 
+  queryParams, 
+  rules,
+#if($table.sub)
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
+  ${subclassName}List,
+  checked${subClassName},
+#elseif($subTableType == 2)
+#foreach ($subTableInfo in $table.subTables)
+  ${subTableInfo.subclassName}List,
+  checked${subTableInfo.subClassName},
+#end
+#end
+#end
+  total 
+} = toRefs(state);
 
-/** 查询${functionName}列表 */
+function handleQuery() {
+  queryParams.value.pageNum = 1
+  state.loading = true
+  getList()
+}
+
+function resetQuery() {
+  proxy.resetForm("queryRef")
+  handleQuery()
+  state.loading = false
+}
+
+// 表单重置
+function reset() {
+  form.value = {
+#foreach($column in $columns)
+#if($column.htmlType == "radio" || $column.htmlType == "select" || $column.htmlType == "checkbox")
+    ${column.javaField}: undefined,
+#else
+    ${column.javaField}: undefined,
+#end
+#end
+  }
+#foreach($column in $columns)
+#if($column.htmlType == "checkbox")
+  form.value.${column.javaField} = []
+#end
+#end
+#if($table.sub)
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
+  ${subclassName}List.value = []
+#elseif($subTableType == 2)
+#foreach ($subTableInfo in $table.subTables)
+  ${subTableInfo.subclassName}List.value = []
+#end
+#end
+#end
+  proxy.resetForm("${businessName}Ref");
+}
+
+// 取消按钮
+function cancel() {
+  state.dialogVisible = false
+  reset()
+}
+
+// 表单提交
+/** 提交按钮 */
+function submitForm() {
+  proxy.$refs["${businessName}Ref"].validate(valid => {
+    if (valid) {
+#foreach ($column in $columns)
+#if($column.htmlType == "checkbox")
+      state.form.${column.javaField} = state.form.${column.javaField}.join(",")
+#end
+#end
+#if($table.sub)
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
+      state.form.${subclassName}List = state.${subclassName}List
+#elseif($subTableType == 2)
+#foreach ($subTableInfo in $table.subTables)
+      state.form.${subTableInfo.subclassName}List = state.${subTableInfo.subclassName}List
+#end
+#end
+#end
+      if (state.form.${pkColumn.javaField} != null) {
+        update${BusinessName}(state.form).then(response => {
+          proxy.$modal.msgSuccess("修改成功")
+          state.dialogVisible = false
+          getList()
+        })
+      } else {
+        add${BusinessName}(state.form).then(response => {
+          proxy.$modal.msgSuccess("新增成功")
+          state.dialogVisible = false
+          getList()
+        })
+      }
+    }
+  })
+}
+
+// 查询表格数据
 function getList() {
   loading.value = true
-#foreach ($column in $columns)
-#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
-  queryParams.value.params = {}
-#break
-#end
-#end
-#foreach ($column in $columns)
-#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
-#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-  if (null != daterange${AttrName} && '' != daterange${AttrName}) {
-    queryParams.value.params["begin${AttrName}"] = daterange${AttrName}.value[0]
-    queryParams.value.params["end${AttrName}"] = daterange${AttrName}.value[1]
-  }
-#end
-#end
   list${BusinessName}(queryParams.value).then(response => {
     ${businessName}List.value = response.rows
     total.value = response.total
@@ -428,61 +599,14 @@ function getList() {
   })
 }
 
-// 取消按钮
-function cancel() {
-  open.value = false
-  reset()
-}
-
-// 表单重置
-function reset() {
-  form.value = {
-#foreach ($column in $columns)
-#if($column.htmlType == "checkbox")
-    $column.javaField: []#if($foreach.count != $columns.size()),#end
-#else
-    $column.javaField: null#if($foreach.count != $columns.size()),#end
-#end
-#end
-  }
-#if($table.sub)
-  ${subclassName}List.value = []
-#end
-  proxy.resetForm("${businessName}Ref")
-}
-
-/** 搜索按钮操作 */
-function handleQuery() {
-  queryParams.value.pageNum = 1
-  getList()
-}
-
-/** 重置按钮操作 */
-function resetQuery() {
-#foreach ($column in $columns)
-#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
-#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-  daterange${AttrName}.value = []
-#end
-#end
-  proxy.resetForm("queryRef")
-  handleQuery()
-}
-
-// 多选框选中数据
-function handleSelectionChange(selection) {
-  ids.value = selection.map(item => item.${pkColumn.javaField})
-  single.value = selection.length != 1
-  multiple.value = !selection.length
-}
-
-/** 新增按钮操作 */
+// 处理新增操作
 function handleAdd() {
   reset()
   open.value = true
   title.value = "添加${functionName}"
 }
 
+// 处理修改操作
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset()
@@ -491,58 +615,48 @@ function handleUpdate(row) {
     form.value = response.data
 #foreach ($column in $columns)
 #if($column.htmlType == "checkbox")
-    form.value.$column.javaField = form.value.${column.javaField}.split(",")
+    form.value.${column.javaField} = form.value.${column.javaField}.split(",")
 #end
 #end
 #if($table.sub)
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
     ${subclassName}List.value = response.data.${subclassName}List
+#elseif($subTableType == 2)
+#foreach ($subTableInfo in $table.subTables)
+    ${subTableInfo.subclassName}List.value = response.data.${subTableInfo.subclassName}List
+#end
+#end
 #end
     open.value = true
     title.value = "修改${functionName}"
   })
 }
 
-/** 提交按钮 */
-function submitForm() {
-  proxy.#[[$]]#refs["${businessName}Ref"].validate(valid => {
-    if (valid) {
-#foreach ($column in $columns)
-#if($column.htmlType == "checkbox")
-      form.value.$column.javaField = form.value.${column.javaField}.join(",")
-#end
-#end
-#if($table.sub)
-      form.value.${subclassName}List = ${subclassName}List.value
-#end
-      if (form.value.${pkColumn.javaField} != null) {
-        update${BusinessName}(form.value).then(response => {
-          proxy.#[[$modal]]#.msgSuccess("修改成功")
-          open.value = false
-          getList()
-        })
-      } else {
-        add${BusinessName}(form.value).then(response => {
-          proxy.#[[$modal]]#.msgSuccess("新增成功")
-          open.value = false
-          getList()
-        })
-      }
-    }
-  })
-}
-
+// 处理删除操作
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const _${pkColumn.javaField}s = row.${pkColumn.javaField} || ids.value
-  proxy.#[[$modal]]#.confirm('是否确认删除${functionName}编号为"' + _${pkColumn.javaField}s + '"的数据项？').then(function() {
-    return del${BusinessName}(_${pkColumn.javaField}s)
+  const _${pkColumn.javaField}s = row ? row.${pkColumn.javaField} : ids.value;
+  proxy.$modal.confirm('是否确认删除${functionName}编号为"' + _${pkColumn.javaField}s + '"的数据项？').then(() => {
+    return del${BusinessName}(_${pkColumn.javaField}s);
   }).then(() => {
-    getList()
-    proxy.#[[$modal]]#.msgSuccess("删除成功")
-  }).catch(() => {})
+    getList();
+    proxy.$modal.msgSuccess("删除成功");
+    state.loading = false
+  }).catch(() => {
+    state.loading = false
+  });
 }
 
 #if($table.sub)
+#set($subTableType = $table.subTableType)
+#if(!$subTableType)
+#set($subTableType = 1)
+#end
+#if($subTableType == 1)
 /** ${subTable.functionName}序号 */
 function row${subClassName}Index({ row, rowIndex }) {
   row.index = rowIndex + 1
@@ -554,20 +668,20 @@ function handleAdd${subClassName}() {
 #foreach($column in $subTable.columns)
 #if($column.pk || $column.javaField == ${subTableFkclassName})
 #elseif($column.list && "" != $javaField)
-  obj.$column.javaField = ""
+  obj.${column.javaField} = ""
 #end
 #end
-  ${subclassName}List.value.push(obj)
+  state.${subclassName}List.push(obj)
 }
 
 /** ${subTable.functionName}删除按钮操作 */
 function handleDelete${subClassName}() {
-  if (checked${subClassName}.value.length == 0) {
-    proxy.#[[$modal]]#.msgError("请先选择要删除的${subTable.functionName}数据")
+  if (state.checked${subClassName}.length == 0) {
+    proxy.$modal.msgError("请先选择要删除的${subTable.functionName}数据")
   } else {
-    const ${subclassName}s = ${subclassName}List.value
-    const checked${subClassName}s = checked${subClassName}.value
-    ${subclassName}List.value = ${subclassName}s.filter(function(item) {
+    const ${subclassName}s = state.${subclassName}List
+    const checked${subClassName}s = state.checked${subClassName}
+    state.${subclassName}List = ${subclassName}s.filter(function(item) {
       return checked${subClassName}s.indexOf(item.index) == -1
     })
   }
@@ -575,15 +689,52 @@ function handleDelete${subClassName}() {
 
 /** 复选框选中数据 */
 function handle${subClassName}SelectionChange(selection) {
-  checked${subClassName}.value = selection.map(item => item.index)
+  state.checked${subClassName} = selection.map(item => item.index)
+}
+#elseif($subTableType == 2)
+#foreach ($subTableInfo in $table.subTables)
+/** ${subTableInfo.subTable.functionName}序号 */
+function row${subTableInfo.subClassName}Index({ row, rowIndex }) {
+  row.index = rowIndex + 1
 }
 
+/** ${subTableInfo.subTable.functionName}添加按钮操作 */
+function handleAdd${subTableInfo.subClassName}() {
+  let obj = {}
+#foreach($column in $subTableInfo.subTable.columns)
+#if($column.pk || $column.javaField == ${subTableInfo.subTableFkclassName})
+#elseif($column.list && "" != $javaField)
+  obj.${column.javaField} = ""
 #end
+#end
+  state.${subTableInfo.subclassName}List.push(obj)
+}
+
+/** ${subTableInfo.subTable.functionName}删除按钮操作 */
+function handleDelete${subTableInfo.subClassName}() {
+  if (state.checked${subTableInfo.subClassName}.length == 0) {
+    proxy.$modal.msgError("请先选择要删除的${subTableInfo.subTable.functionName}数据")
+  } else {
+    const ${subTableInfo.subclassName}s = state.${subTableInfo.subclassName}List
+    const checked${subTableInfo.subClassName}s = state.checked${subTableInfo.subClassName}
+    state.${subTableInfo.subclassName}List = ${subTableInfo.subclassName}s.filter(function(item) {
+      return checked${subTableInfo.subClassName}s.indexOf(item.index) == -1
+    })
+  }
+}
+
+/** 复选框选中数据 */
+function handle${subTableInfo.subClassName}SelectionChange(selection) {
+  state.checked${subTableInfo.subClassName} = selection.map(item => item.index)
+}
+#end
+#end
+
 /** 导出按钮操作 */
 function handleExport() {
   proxy.download('${moduleName}/${businessName}/export', {
-    ...queryParams.value
-  }, `${businessName}_#[[${new Date().getTime()}]]#.xlsx`)
+    ...state.queryParams
+  }, `${businessName}_${new Date().getTime()}.xlsx`)
 }
 
 getList()
