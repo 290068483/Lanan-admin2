@@ -488,7 +488,7 @@ public class GenTableServiceImpl implements IGenTableService
     {
         // 根据subTableType决定如何处理子表
         Integer subTableType = table.getSubTableType();
-        if (subTableType == null) {
+        if (subTableType == null || subTableType == 0) {
             subTableType = 1; // 默认为一对一
         }
         

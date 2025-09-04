@@ -16,7 +16,9 @@
         <!-- 子表关联（Collection） -->
         #if($table.sub)
             #set($subTableType = $table.subTableType)
-            #if(!$subTableType)#set($subTableType = 1)#end
+            #if(!$subTableType || $subTableType == "")
+                #set($subTableType = 1)
+            #end
             #if($subTableType == 1)
                 <collection property="${subclassName}List" javaType="java.util.List" resultMap="${subClassName}Result" />
             #elseif($subTableType == 2)
@@ -30,7 +32,9 @@
     <!-- 2. 子表 ResultMap（按需生成） -->
     #if($table.sub)
         #set($subTableType = $table.subTableType)
-        #if(!$subTableType)#set($subTableType = 1)#end
+        #if(!$subTableType || $subTableType == "")
+            #set($subTableType = 1)
+        #end
         #if($subTableType == 1)
             <resultMap type="${subClassName}" id="${subClassName}Result">
                 #foreach ($column in $subTable.columns)
@@ -66,7 +70,9 @@
     <!-- 4. 子表字段 SQL 片段（按需生成） -->
     #if($table.sub)
         #set($subTableType = $table.subTableType)
-        #if(!$subTableType)#set($subTableType = 1)#end
+        #if(!$subTableType || $subTableType == "")
+            #set($subTableType = 1)
+        #end
         #if($subTableType == 1)
             <sql id="${subclassName}Vo">
                 #foreach ($column in $subTable.columns)
@@ -174,7 +180,9 @@
     <!-- 11. 子表操作（按需生成，修复：批量插入字段逗号问题） -->
     #if($table.sub)
         #set($subTableType = $table.subTableType)
-        #if(!$subTableType)#set($subTableType = 1)#end
+        #if(!$subTableType || $subTableType == "")
+            #set($subTableType = 1)
+        #end
         #if($subTableType == 1)
             <!-- 子表单条删除 -->
             <delete id="delete${subClassName}By${subTableFkClassName}" parameterType="${pkColumn.javaType}">

@@ -270,7 +270,7 @@
 #if($table.sub)
         <el-divider content-position="center">${subTable.functionName}信息</el-divider>
 #set($subTableType = $table.subTableType)
-#if(!$subTableType)
+#if(!$subTableType || $subTableType == "" || $subTableType == 0)
 #set($subTableType = 1)
 #end
 #if($subTableType == 1)

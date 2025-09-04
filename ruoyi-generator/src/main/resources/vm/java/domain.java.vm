@@ -41,7 +41,7 @@ public class ${ClassName} extends BaseEntity
 
 #if($table.sub)
 #set($subTableType = $table.subTableType)
-#if(!$subTableType)
+#if(!$subTableType || $subTableType == "")
 #set($subTableType = 1)
 #end
 #if($subTableType == 1)
@@ -115,7 +115,7 @@ public class ${ClassName} extends BaseEntity
 
 #if($table.sub)
 #set($subTableType = $table.subTableType)
-#if(!$subTableType)
+#if(!$subTableType || $subTableType == "")
 #set($subTableType = 1)
 #end
 #if($subTableType == 1)

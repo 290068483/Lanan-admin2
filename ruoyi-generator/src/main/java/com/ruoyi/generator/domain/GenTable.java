@@ -204,6 +204,9 @@ public class GenTable extends BaseEntity
     @JsonProperty("subTableType")
     public Integer getSubTableType()
     {
+        if (subTableType == null) {
+            return 1; // 默认为一对一
+        }
         return subTableType;
     }
 

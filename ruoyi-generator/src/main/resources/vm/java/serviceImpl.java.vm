@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import com.ruoyi.common.utils.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 #set($subTableType = $table.subTableType)
-#if(!$subTableType)
+#if(!$subTableType || $subTableType == "")
 #set($subTableType = 1)
 #end
 #if($subTableType == 1)
@@ -83,7 +83,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service
 #end
 #if($table.sub)
 #set($subTableType = $table.subTableType)
-#if(!$subTableType)
+#if(!$subTableType || $subTableType == "")
 #set($subTableType = 1)
 #end
 #if($subTableType == 1)
@@ -124,7 +124,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service
 #end
 #if($table.sub)
 #set($subTableType = $table.subTableType)
-#if(!$subTableType)
+#if(!$subTableType || $subTableType == "")
 #set($subTableType = 1)
 #end
 #if($subTableType == 1)
@@ -169,7 +169,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service
         ${className}Mapper.delete${ClassName}By${pkColumn.capJavaField}(${pkColumn.javaField});
 #if($table.sub)
 #set($subTableType = $table.subTableType)
-#if(!$subTableType)
+#if(!$subTableType || $subTableType == "")
 #set($subTableType = 1)
 #end
 #if($subTableType == 1)
@@ -186,7 +186,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service
 
 #if($table.sub)
 #set($subTableType = $table.subTableType)
-#if(!$subTableType)
+#if(!$subTableType || $subTableType == "")
 #set($subTableType = 1)
 #end
 #if($subTableType == 1)

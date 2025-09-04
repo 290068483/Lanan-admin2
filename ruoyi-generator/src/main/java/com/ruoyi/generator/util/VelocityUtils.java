@@ -134,7 +134,7 @@ public class VelocityUtils
         
         // 根据subTableType决定如何处理子表
         Integer subTableType = genTable.getSubTableType();
-        if (subTableType == null) {
+        if (subTableType == null || subTableType == 0) {
             subTableType = 1; // 默认为一对一
         }
         
