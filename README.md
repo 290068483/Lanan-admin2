@@ -1,27 +1,36 @@
 <p align="center">
-	<img alt="logo" src="https://oscimg.oschina.net/oscnet/up-d3d0a9303e11d522a06cd263f3079027715.png">
+	<img alt="logo" src="https://oscimg.oschina.net/oscnet/up-43e3941654501c02081235410d952b69893.png">
 </p>
-<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">RuoYi v3.9.0</h1>
-<h4 align="center">基于SpringBoot+Vue前后端分离的Java快速开发框架</h4>
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">RuoYi-Vue v3.9.0</h1>
+<h4 align="center">基于SpringBoot+Vue3前后端分离的Java快速开发框架</h4>
 <p align="center">
-	<a href="https://gitee.com/y_project/RuoYi-Vue/stargazers"><img src="https://gitee.com/y_project/RuoYi-Vue/badge/star.svg?theme=dark"></a>
-	<a href="https://gitee.com/y_project/RuoYi-Vue"><img src="https://img.shields.io/badge/RuoYi-v3.9.0-brightgreen.svg"></a>
-	<a href="https://gitee.com/y_project/RuoYi-Vue/blob/master/LICENSE"><img src="https://img.shields.io/github/license/mashape/apistatus.svg"></a>
+	<a href="https://gitee.com/y_project/RuoYi-Vue"><img src="https://gitee.com/y_project/RuoYi-Vue/badge/star.svg?theme=dark"></a>
+	<a href="https://gitee.com/y_project/RuoYi-Vue"><img src="https://gitee.com/y_project/RuoYi-Vue/badge/fork.svg?theme=dark"></a>
+	<a href="https://github.com/yangzongzhuan/RuoYi-Vue/stargazers"><img src="https://img.shields.io/github/stars/yangzongzhuan/RuoYi-Vue"></a>
+	<a href="https://github.com/yangzongzhuan/RuoYi-Vue/network/members"><img src="https://img.shields.io/github/forks/yangzongzhuan/RuoYi-Vue"></a>
+	<a href="https://github.com/yangzongzhuan/RuoYi-Vue/blob/master/LICENSE"><img src="https://img.shields.io/github/license/yangzongzhuan/RuoYi-Vue"></a>
+</p>
+
+<p align="center">
+	<a href="https://gitee.com/y_project/RuoYi-Vue">Gitee</a> &nbsp;|&nbsp;
+	<a href="https://github.com/yangzongzhuan/RuoYi-Vue">GitHub</a> &nbsp;|&nbsp;
+	<a href="#演示图">演示图</a> &nbsp;|&nbsp;
+	<a href="#内置功能">内置功能</a> &nbsp;|&nbsp;
+	<a href="#在线体验">在线体验</a> &nbsp;|&nbsp;
+	<a href="#快速启动">快速启动</a> &nbsp;|&nbsp;
+	<a href="#接口文档">接口文档</a>
 </p>
 
 ## 平台简介
 
 若依是一套全部开源的快速开发平台，毫无保留给个人及企业免费使用。
 
-* 前端采用Vue、Element UI。
-* 后端采用Spring Boot、Spring Security、Redis & Jwt。
-* 权限认证使用Jwt，支持多终端认证系统。
-* 支持加载动态权限菜单，多方式轻松权限控制。
-* 高效率开发，使用代码生成器可以一键生成前后端代码。
-* 提供了技术栈（[Vue3](https://v3.cn.vuejs.org) [Element Plus](https://element-plus.org/zh-CN) [Vite](https://cn.vitejs.dev)）版本[RuoYi-Vue3](https://gitcode.com/yangzongzhuan/RuoYi-Vue3)，保持同步更新。
-* 提供了单应用版本[RuoYi-Vue-fast](https://gitcode.com/yangzongzhuan/RuoYi-Vue-fast)，Oracle版本[RuoYi-Vue-Oracle](https://gitcode.com/yangzongzhuan/RuoYi-Vue-Oracle)，保持同步更新。
-* 不分离版本，请移步[RuoYi](https://gitee.com/y_project/RuoYi)，微服务版本，请移步[RuoYi-Cloud](https://gitee.com/y_project/RuoYi-Cloud)
-* 阿里云折扣场：[点我进入](http://aly.ruoyi.vip)，腾讯云秒杀场：[点我进入](http://txy.ruoyi.vip)&nbsp;&nbsp;
+* 本仓库为RuoYi-Vue的后端，前端地址：[ruoyi-vue](https://gitee.com/y_project/RuoYi-Vue/tree/master/ruoyi-ui)
+* 前后端分离架构，前端技术栈采用Vue3、Element Plus，后端技术栈Spring Boot、MyBatis、Shiro
+* 权限认证使用Shiro，支持多终端认证系统
+* 支持加载动态权限菜单，多方式轻松权限控制
+* 高效率开发，使用代码生成器可以一键生成前后端代码
+* 集成微信公众号、企业微信，支持第三方登录
 
 ## 内置功能
 
@@ -46,48 +55,102 @@
 
 ## 在线体验
 
-- admin/admin123  
-- 陆陆续续收到一些打赏，为了更好的体验已用于演示服务器升级。谢谢各位小伙伴。
-
-演示地址：http://vue.ruoyi.vip  
-文档地址：http://doc.ruoyi.vip
+- admin/admin123
+- 陆陆续续有人反馈数据被删除或修改，演示地址暂时关闭
 
 ## 演示图
 
-<table>
-    <tr>
-        <td><img src="https://oscimg.oschina.net/oscnet/cd1f90be5f2684f4560c9519c0f2a232ee8.jpg"/></td>
-        <td><img src="https://oscimg.oschina.net/oscnet/1cbcf0e6f257c7d3a063c0e3f2ff989e4b3.jpg"/></td>
-    </tr>
-    <tr>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-8074972883b5ba0622e13246738ebba237a.png"/></td>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-9f88719cdfca9af2e58b352a20e23d43b12.png"/></td>
-    </tr>
-    <tr>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-39bf2584ec3a529b0d5a3b70d15c9b37646.png"/></td>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-936ec82d1f4872e1bc980927654b6007307.png"/></td>
-    </tr>
-	<tr>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-b2d62ceb95d2dd9b3fbe157bb70d26001e9.png"/></td>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-d67451d308b7a79ad6819723396f7c3d77a.png"/></td>
-    </tr>	 
-    <tr>
-        <td><img src="https://oscimg.oschina.net/oscnet/5e8c387724954459291aafd5eb52b456f53.jpg"/></td>
-        <td><img src="https://oscimg.oschina.net/oscnet/644e78da53c2e92a95dfda4f76e6d117c4b.jpg"/></td>
-    </tr>
-	<tr>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-8370a0d02977eebf6dbf854c8450293c937.png"/></td>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-49003ed83f60f633e7153609a53a2b644f7.png"/></td>
-    </tr>
-	<tr>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-d4fe726319ece268d4746602c39cffc0621.png"/></td>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-c195234bbcd30be6927f037a6755e6ab69c.png"/></td>
-    </tr>
-    <tr>
-        <td><img src="https://oscimg.oschina.net/oscnet/b6115bc8c31de52951982e509930b20684a.jpg"/></td>
-        <td><img src="https://oscimg.oschina.net/oscnet/up-5e4daac0bb59612c5038448acbcef235e3a.png"/></td>
-    </tr>
-</table>
+... (略)
+
+## 快速启动
+
+### 环境要求
+
+- JDK >= 1.8 (推荐1.8版本)
+- Mysql >= 5.7 (推荐5.7版本)
+- Maven >= 3.0
+- Node >= 12
+
+### 开发工具推荐
+
+- IDEA
+- VSCode
+- Navicat
+- Typora
+
+### 启动后端
+
+1. 创建数据库，执行sql目录下的ry数据库脚本
+2. 修改application-druid.yml，更新MySQL账号和密码
+3. 运行RuoYiApplication.java启动项目
+4. 访问 http://localhost:8080
+
+### 启动前端
+
+1. 进入ruoyi-ui目录
+2. 执行 npm install
+3. 执行 npm run dev
+4. 访问 http://localhost:80
+
+## 接口文档
+
+### 在线文档
+
+系统集成了Swagger在线接口文档，访问地址：http://localhost:8080/doc.html
+
+### 本地文档
+
+系统提供详细的API接口文档，详见 [doc/api.md](doc/api.md) 文件。
+
+新增接口说明：
+
+#### 获取用户岗位信息
+
+- **接口地址**: `/getPostInfo`
+- **请求方式**: GET
+- **请求参数**: 无
+- **返回结果**:
+```json
+{
+  "code": 200,
+  "msg": "操作成功",
+  "postNames": ["董事长", "总经理"],
+  "posts": [
+    {
+      "postId": 1,
+      "postCode": "CEO",
+      "postName": "董事长",
+      "postSort": 1,
+      "status": "0",
+      "remark": "董事长岗位"
+    },
+    {
+      "postId": 2,
+      "postCode": "GM",
+      "postName": "总经理",
+      "postSort": 2,
+      "status": "0",
+      "remark": "总经理岗位"
+    }
+  ]
+}
+```
+
+## 演示图
+
+... (略)
+
+## 如何贡献
+
+... (略)
+
+## 版权声明
+
+... (略)
+
+## 联系我们
+
+... (略)
 
 
 ## 若依前后端分离交流群

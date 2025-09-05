@@ -42,6 +42,22 @@ public interface ISysPostService
     public List<Long> selectPostListByUserId(Long userId);
 
     /**
+     * 根据用户名获取岗位列表
+     * 
+     * @param userName 用户名
+     * @return 岗位列表
+     */
+    public List<SysPost> selectPostsByUserName(String userName);
+
+    /**
+     * 根据用户ID获取岗位列表
+     * 
+     * @param userId 用户ID
+     * @return 岗位列表
+     */
+    public List<SysPost> selectPostsByUserId(Long userId);
+
+    /**
      * 校验岗位名称
      * 
      * @param post 岗位信息

@@ -3,6 +3,7 @@ package com.ruoyi.web.controller.system;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +13,7 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.common.core.domain.model.LoginBody;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.text.Convert;
@@ -23,6 +25,7 @@ import com.ruoyi.framework.web.service.SysPermissionService;
 import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysMenuService;
+import com.ruoyi.system.service.ISysPostService;
 
 /**
  * 登录验证
@@ -46,6 +49,9 @@ public class SysLoginController
 
     @Autowired
     private ISysConfigService configService;
+    
+    @Autowired
+    private ISysPostService postService;
 
     /**
      * 登录方法
@@ -90,6 +96,35 @@ public class SysLoginController
         ajax.put("isDefaultModifyPwd", initPasswordIsModify(user.getPwdUpdateDate()));
         ajax.put("isPasswordExpired", passwordIsExpiration(user.getPwdUpdateDate()));
         return ajax;
+    }
+
+    /**
+     * 获取当前用户岗位信息
+     *
+     * @return 岗位信息
+     */
+    @GetMapping("getPostInfo")
+    public AjaxResult getPostInfo()
+    {
+        try {
+            LoginUser loginUser = SecurityUtils.getLoginUser();
+            SysUser user = loginUser.getUser();
+            
+            // 获取用户岗位信息（根据用户ID查询，避免用户名重复问题）
+            List<SysPost> posts = postService.selectPostsByUserId(user.getUserId());
+            
+            // 提取岗位名称
+            List<String> postNames = posts.stream()
+                    .map(SysPost::getPostName)
+                    .collect(Collectors.toList());
+            
+            AjaxResult ajax = AjaxResult.success();
+            ajax.put("postNames", postNames);
+            ajax.put("posts", posts);
+            return ajax;
+        } catch (Exception e) {
+            return AjaxResult.error("获取岗位信息失败: " + e.getMessage());
+        }
     }
 
     /**

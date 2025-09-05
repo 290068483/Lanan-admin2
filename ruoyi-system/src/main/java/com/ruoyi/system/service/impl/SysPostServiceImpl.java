@@ -73,6 +73,30 @@ public class SysPostServiceImpl implements ISysPostService
     }
 
     /**
+     * 根据用户名获取岗位列表
+     * 
+     * @param userName 用户名
+     * @return 岗位列表
+     */
+    @Override
+    public List<SysPost> selectPostsByUserName(String userName)
+    {
+        return postMapper.selectPostsByUserName(userName);
+    }
+
+    /**
+     * 根据用户ID获取岗位列表
+     * 
+     * @param userId 用户ID
+     * @return 岗位列表
+     */
+    @Override
+    public List<SysPost> selectPostsByUserId(Long userId)
+    {
+        return postMapper.selectPostsByUserId(userId);
+    }
+
+    /**
      * 校验岗位名称是否唯一
      * 
      * @param post 岗位信息
