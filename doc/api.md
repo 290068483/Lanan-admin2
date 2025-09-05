@@ -38,7 +38,17 @@
     "userId": 1,
     "userName": "admin",
     "nickName": "管理员",
-    // ... 其他用户信息
+    "deptId": 100,
+    "dept": {
+      "deptId": 100,
+      "parentId": 0,
+      "deptName": "研发部门",
+      "orderNum": 1,
+      "leader": "admin",
+      "phone": "15888888888",
+      "email": "admin@163.com",
+      "status": "0"
+    }
   },
   "roles": ["admin"],
   "permissions": ["*:*:*"]
@@ -76,6 +86,14 @@
 }
 ```
 
+当获取岗位信息失败时，会返回错误信息:
+```json
+{
+  "code": 500,
+  "msg": "获取岗位信息失败: 具体错误信息"
+}
+```
+
 #### 1.1.4 获取路由信息
 - **接口地址**: `/getRouters`
 - **请求方式**: GET
@@ -86,7 +104,6 @@
   "code": 200,
   "msg": "操作成功",
   "data": [
-    // 路由信息列表
   ]
 }
 ```
@@ -980,3 +997,486 @@
   "msg": "操作成功"
 }
 ```
+
+### 1.10 待处理事件接口
+
+#### 1.10.1 查询待处理事件列表
+- **接口地址**: `/pendingEvents/list`
+- **请求方式**: GET
+- **请求参数**:
+  - userId: 用户ID（必需）
+  - status: 事件状态（可选，默认为待处理状态）
+  - pageNum: 页码（可选，默认为1）
+  - pageSize: 每页条数（可选，默认为10）
+- **说明**: 
+  - 该接口根据提供的userId返回相应用户的待处理事件列表
+  - 普通用户只能查询自己的待处理事件（userId必须是当前用户ID）
+  - 管理员用户可以查询任意用户的待处理事件
+- **返回结果**:
+```json
+{
+  "code": 200,
+  "msg": "操作成功",
+  "rows": [
+    {
+      "eventId": 1,
+      "userId": 1,
+      "eventName": "订单处理",
+      "eventDetail": "订单号：ORD20250905001",
+      "eventStatus": "未处理",
+      "createTime": "2025-09-05 10:00:00",
+      "updateTime": "2025-09-05 10:00:00"
+    }
+  ],
+  "total": 1
+}
+```
+
+#### 1.10.2 获取待处理事件详细信息
+- **接口地址**: `/pendingEvents/{eventId}`
+- **请求方式**: GET
+- **请求参数**: eventId 事件ID
+- **说明**: 
+  - 该接口根据事件ID获取详细信息
+  - 用户只能访问自己有权限查看的事件详情
+- **返回结果**:
+```json
+{
+  "code": 200,
+  "msg": "操作成功",
+  "data": {
+    "eventId": 1,
+    "userId": 1,
+    "eventName": "订单处理",
+    "eventDetail": "订单号：ORD20250905001",
+    "eventStatus": "未处理",
+    "createTime": "2025-09-05 10:00:00",
+    "updateTime": "2025-09-05 10:00:00"
+  }
+}
+```
+
+#### 1.10.3 新增待处理事件
+- **接口地址**: `/pendingEvents`
+- **请求方式**: POST
+- **请求参数**:
+```json
+{
+  "userId": 1,
+  "eventName": "事件名称",
+  "eventDetail": "事件详细描述",
+  "eventStatus": "未处理"
+}
+```
+- **说明**: 
+  - 新增待处理事件
+  - 事件创建者为当前登录用户
+- **返回结果**:
+```json
+{
+  "code": 200,
+  "msg": "操作成功"
+}
+```
+
+#### 1.10.4 修改待处理事件
+- **接口地址**: `/pendingEvents`
+- **请求方式**: PUT
+- **请求参数**:
+```json
+{
+  "eventId": 1,
+  "userId": 1,
+  "eventName": "事件名称",
+  "eventDetail": "事件详细描述",
+  "eventStatus": "处理中"
+}
+```
+- **说明**: 
+  - 修改待处理事件
+  - 用户只能修改自己有权限处理的事件
+- **返回结果**:
+```json
+{
+  "code": 200,
+  "msg": "操作成功"
+}
+```
+
+#### 1.10.5 删除待处理事件
+- **接口地址**: `/pendingEvents/{eventIds}`
+- **请求方式**: DELETE
+- **请求参数**: eventIds 事件ID列表，多个用逗号分隔
+- **说明**: 
+  - 删除待处理事件
+  - 用户只能删除自己有权限处理的事件
+- **返回结果**:
+```json
+{
+  "code": 200,
+  "msg": "操作成功"
+}
+```
+
+### 1.11 未读消息接口
+
+#### 1.11.1 查询未读消息列表
+- **接口地址**: `/unreadMessage/list`
+- **请求方式**: GET
+- **请求参数**:
+  - pageNum: 页码
+  - pageSize: 每页条数
+  - userId: 用户ID
+  - messageType: 消息类型
+  - isRead: 是否已读
+- **说明**: 
+  - 查询未读消息列表
+  - 支持按用户ID、消息类型和是否已读进行筛选
+- **返回结果**:
+```json
+{
+  "code": 200,
+  "msg": "操作成功",
+  "rows": [
+    {
+      "messageId": 1,
+      "userId": 1,
+      "messageTitle": "系统通知",
+      "messageContent": "这是一条系统通知",
+      "messageType": "NOTICE",
+      "isRead": "0",
+      "createTime": "2023-01-01 12:00:00",
+      "updateTime": "2023-01-01 12:00:00"
+    }
+  ],
+  "total": 1
+}
+```
+
+#### 1.11.2 获取未读消息详细信息
+- **接口地址**: `/unreadMessage/{messageId}`
+- **请求方式**: GET
+- **请求参数**: messageId 消息ID
+- **说明**: 
+  - 获取未读消息详细信息
+- **返回结果**:
+```json
+{
+  "code": 200,
+  "msg": "操作成功",
+  "data": {
+    "messageId": 1,
+    "userId": 1,
+    "messageTitle": "系统通知",
+    "messageContent": "这是一条系统通知",
+    "messageType": "NOTICE",
+    "isRead": "0",
+    "createTime": "2023-01-01 12:00:00",
+    "updateTime": "2023-01-01 12:00:00"
+  }
+}
+```
+
+#### 1.11.3 新增未读消息
+- **接口地址**: `/unreadMessage`
+- **请求方式**: POST
+- **请求参数**:
+```json
+{
+  "userId": 1,
+  "messageTitle": "消息标题",
+  "messageContent": "消息内容",
+  "messageType": "消息类型",
+  "isRead": "是否已读"
+}
+```
+- **说明**: 
+  - 新增未读消息
+- **返回结果**:
+```json
+{
+  "code": 200,
+  "msg": "操作成功"
+}
+```
+
+#### 1.11.4 修改未读消息
+- **接口地址**: `/unreadMessage`
+- **请求方式**: PUT
+- **请求参数**:
+```json
+{
+  "messageId": 1,
+  "userId": 1,
+  "messageTitle": "更新后的消息标题",
+  "messageContent": "更新后的消息内容",
+  "messageType": "更新后的消息类型",
+  "isRead": "更新后的是否已读状态"
+}
+```
+- **说明**: 
+  - 修改未读消息
+- **返回结果**:
+```json
+{
+  "code": 200,
+  "msg": "操作成功"
+}
+```
+
+#### 1.11.5 删除未读消息
+- **接口地址**: `/unreadMessage/{messageIds}`
+- **请求方式**: DELETE
+- **请求参数**: messageIds 消息ID列表，多个用逗号分隔
+- **说明**: 
+  - 删除未读消息
+- **返回结果**:
+```json
+{
+  "code": 200,
+  "msg": "操作成功"
+}
+```
+
+### 1.12 未完工客户单接口
+
+#### 1.12.1 查询未完工客户单列表
+- **接口地址**: `/unfinishedCustomerOrder/list`
+- **请求方式**: GET
+- **请求参数**:
+  - pageNum: 页码
+  - pageSize: 每页条数
+  - userId: 用户ID
+  - orderCode: 客户单编号
+  - customerName: 客户名称
+  - orderStatus: 订单状态
+- **说明**: 
+  - 查询未完工客户单列表
+  - 支持按用户ID、客户单编号、客户名称和订单状态进行筛选
+- **返回结果**:
+```json
+{
+  "code": 200,
+  "msg": "操作成功",
+  "rows": [
+    {
+      "orderId": 1,
+      "userId": 1,
+      "orderCode": "OC001",
+      "customerName": "张三",
+      "orderAmount": 1000.00,
+      "orderStatus": "PROCESSING",
+      "createTime": "2023-01-01 12:00:00",
+      "updateTime": "2023-01-01 12:00:00"
+    }
+  ],
+  "total": 1
+}
+```
+
+#### 1.12.2 获取未完工客户单详细信息
+- **接口地址**: `/unfinishedCustomerOrder/{orderId}`
+- **请求方式**: GET
+- **请求参数**: orderId 客户单ID
+- **说明**: 
+  - 获取未完工客户单详细信息
+- **返回结果**:
+```json
+{
+  "code": 200,
+  "msg": "操作成功",
+  "data": {
+    "orderId": 1,
+    "userId": 1,
+    "orderCode": "OC001",
+    "customerName": "张三",
+    "orderAmount": 1000.00,
+    "orderStatus": "PROCESSING",
+    "createTime": "2023-01-01 12:00:00",
+    "updateTime": "2023-01-01 12:00:00"
+  }
+}
+```
+
+#### 1.12.3 新增未完工客户单
+- **接口地址**: `/unfinishedCustomerOrder`
+- **请求方式**: POST
+- **请求参数**:
+```json
+{
+  "userId": 1,
+  "orderCode": "客户单编号",
+  "customerName": "客户名称",
+  "orderAmount": 1000.00,
+  "orderStatus": "订单状态"
+}
+```
+- **说明**: 
+  - 新增未完工客户单
+- **返回结果**:
+```json
+{
+  "code": 200,
+  "msg": "操作成功"
+}
+```
+
+#### 1.12.4 修改未完工客户单
+- **接口地址**: `/unfinishedCustomerOrder`
+- **请求方式**: PUT
+- **请求参数**:
+```json
+{
+  "orderId": 1,
+  "userId": 1,
+  "orderCode": "更新后的客户单编号",
+  "customerName": "更新后的客户名称",
+  "orderAmount": 2000.00,
+  "orderStatus": "更新后的订单状态"
+}
+```
+- **说明**: 
+  - 修改未完工客户单
+- **返回结果**:
+```json
+{
+  "code": 200,
+  "msg": "操作成功"
+}
+```
+
+#### 1.12.5 删除未完工客户单
+- **接口地址**: `/unfinishedCustomerOrder/{orderIds}`
+- **请求方式**: DELETE
+- **请求参数**: orderIds 客户单ID列表，多个用逗号分隔
+- **说明**: 
+  - 删除未完工客户单
+- **返回结果**:
+```json
+{
+  "code": 200,
+  "msg": "操作成功"
+}
+```
+
+### 1.13 未完工任务单接口
+
+#### 1.13.1 查询未完工任务单列表
+- **接口地址**: `/unfinishedTaskOrder/list`
+- **请求方式**: GET
+- **请求参数**:
+  - pageNum: 页码
+  - pageSize: 每页条数
+  - userId: 用户ID
+  - taskCode: 任务单编号
+  - taskName: 任务名称
+  - taskStatus: 任务状态
+- **说明**: 
+  - 查询未完工任务单列表
+  - 支持按用户ID、任务单编号、任务名称和任务状态进行筛选
+- **返回结果**:
+```json
+{
+  "code": 200,
+  "msg": "操作成功",
+  "rows": [
+    {
+      "taskId": 1,
+      "userId": 1,
+      "taskCode": "TC001",
+      "taskName": "开发任务",
+      "taskDescription": "完成系统开发",
+      "taskStatus": "PROCESSING",
+      "createTime": "2023-01-01 12:00:00",
+      "updateTime": "2023-01-01 12:00:00"
+    }
+  ],
+  "total": 1
+}
+```
+
+#### 1.13.2 获取未完工任务单详细信息
+- **接口地址**: `/unfinishedTaskOrder/{taskId}`
+- **请求方式**: GET
+- **请求参数**: taskId 任务单ID
+- **说明**: 
+  - 获取未完工任务单详细信息
+- **返回结果**:
+```json
+{
+  "code": 200,
+  "msg": "操作成功",
+  "data": {
+    "taskId": 1,
+    "userId": 1,
+    "taskCode": "TC001",
+    "taskName": "开发任务",
+    "taskDescription": "完成系统开发",
+    "taskStatus": "PROCESSING",
+    "createTime": "2023-01-01 12:00:00",
+    "updateTime": "2023-01-01 12:00:00"
+  }
+}
+```
+
+#### 1.13.3 新增未完工任务单
+- **接口地址**: `/unfinishedTaskOrder`
+- **请求方式**: POST
+- **请求参数**:
+```json
+{
+  "userId": 1,
+  "taskCode": "任务单编号",
+  "taskName": "任务名称",
+  "taskDescription": "任务描述",
+  "taskStatus": "任务状态"
+}
+```
+- **说明**: 
+  - 新增未完工任务单
+- **返回结果**:
+```json
+{
+  "code": 200,
+  "msg": "操作成功"
+}
+```
+
+#### 1.13.4 修改未完工任务单
+- **接口地址**: `/unfinishedTaskOrder`
+- **请求方式**: PUT
+- **请求参数**:
+```json
+{
+  "taskId": 1,
+  "userId": 1,
+  "taskCode": "更新后的任务单编号",
+  "taskName": "更新后的任务名称",
+  "taskDescription": "更新后的任务描述",
+  "taskStatus": "更新后的任务状态"
+}
+```
+- **说明**: 
+  - 修改未完工任务单
+- **返回结果**:
+```json
+{
+  "code": 200,
+  "msg": "操作成功"
+}
+```
+
+#### 1.13.5 删除未完工任务单
+- **接口地址**: `/unfinishedTaskOrder/{taskIds}`
+- **请求方式**: DELETE
+- **请求参数**: taskIds 任务单ID列表，多个用逗号分隔
+- **说明**: 
+  - 删除未完工任务单
+- **返回结果**:
+```json
+{
+  "code": 200,
+  "msg": "操作成功"
+}
+```
+

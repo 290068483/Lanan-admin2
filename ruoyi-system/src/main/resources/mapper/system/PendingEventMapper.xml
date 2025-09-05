@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.PendingEventMapper">
+
+    <resultMap type="PendingEvent" id="PendingEventResult">
+        <result property="eventId" column="event_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="eventName" column="event_name"/>
+        <result property="eventDetail" column="event_detail"/>
+        <result property="eventStatus" column="event_status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <collection property="details" javaType="java.util.List" ofType="PendingEventDetail" select="selectPendingEventDetailsByEventId" column="event_id"/>
+    </resultMap>
+    
+    <resultMap type="PendingEventDetail" id="PendingEventDetailResult">
+        <result property="detailId" column="detail_id"/>
+        <result property="eventId" column="event_id"/>
+        <result property="detailContent" column="detail_content"/>
+        <result property="detailType" column="detail_type"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectPendingEventVo">
+        select event_id, user_id, event_name, event_detail, event_status, create_time, update_time
+        from pending_events
+    </sql>
+
+    <select id="selectPendingEventList" parameterType="PendingEvent" resultMap="PendingEventResult">
+        <include refid="selectPendingEventVo"/>
+        <where>
+            <if test="userId != null and userId != 0">
+                and user_id = #{userId}
+            </if>
+            <if test="eventStatus != null and eventStatus != ''">
+                and event_status = #{eventStatus}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectPendingEventById" parameterType="Long" resultMap="PendingEventResult">
+        <include refid="selectPendingEventVo"/>
+        where event_id = #{eventId}
+    </select>
+    
+    <select id="selectPendingEventDetailsByEventId" parameterType="Long" resultMap="PendingEventDetailResult">
+        select detail_id, event_id, detail_content, detail_type, create_time, update_time
+        from pending_event_details
+        where event_id = #{eventId}
+        order by create_time
+    </select>
+
+    <insert id="insertPendingEvent" parameterType="PendingEvent" useGeneratedKeys="true" keyProperty="eventId">
+        insert into pending_events
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null and userId != 0">
+                user_id,
+            </if>
+            <if test="eventName != null and eventName != ''">
+                event_name,
+            </if>
+            <if test="eventDetail != null and eventDetail != ''">
+                event_detail,
+            </if>
+            <if test="eventStatus != null and eventStatus != ''">
+                event_status,
+            </if>
+            create_time,
+            update_time,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null and userId != 0">
+                #{userId},
+            </if>
+            <if test="eventName != null and eventName != ''">
+                #{eventName},
+            </if>
+            <if test="eventDetail != null and eventDetail != ''">
+                #{eventDetail},
+            </if>
+            <if test="eventStatus != null and eventStatus != ''">
+                #{eventStatus},
+            </if>
+            sysdate(),
+            sysdate(),
+        </trim>
+    </insert>
+
+    <update id="updatePendingEvent" parameterType="PendingEvent">
+        update pending_events
+        <set>
+            <if test="userId != null and userId != 0">
+                user_id = #{userId},
+            </if>
+            <if test="eventName != null and eventName != ''">
+                event_name = #{eventName},
+            </if>
+            <if test="eventDetail != null and eventDetail != ''">
+                event_detail = #{eventDetail},
+            </if>
+            <if test="eventStatus != null and eventStatus != ''">
+                event_status = #{eventStatus},
+            </if>
+            update_time = sysdate(),
+        </set>
+        where event_id = #{eventId}
+    </update>
+
+    <delete id="deletePendingEventById" parameterType="Long">
+        delete from pending_events where event_id = #{eventId}
+    </delete>
+
+    <delete id="deletePendingEventByIds" parameterType="Long">
+        delete from pending_events where event_id in
+        <foreach item="eventId" collection="array" open="(" separator="," close=")">
+            #{eventId}
+        </foreach>
+    </delete>
+
+</mapper>

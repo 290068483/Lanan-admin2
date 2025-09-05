@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.UnfinishedCustomerOrderMapper">
+
+    <resultMap type="UnfinishedCustomerOrder" id="UnfinishedCustomerOrderResult">
+        <result property="orderId" column="order_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="orderCode" column="order_code"/>
+        <result property="customerName" column="customer_name"/>
+        <result property="orderAmount" column="order_amount"/>
+        <result property="orderStatus" column="order_status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectUnfinishedCustomerOrderVo">
+        select order_id, user_id, order_code, customer_name, order_amount, order_status, create_time, update_time
+        from unfinished_customer_order
+    </sql>
+
+    <select id="selectUnfinishedCustomerOrderList" parameterType="UnfinishedCustomerOrder" resultMap="UnfinishedCustomerOrderResult">
+        <include refid="selectUnfinishedCustomerOrderVo"/>
+        <where>
+            <if test="userId != null and userId != 0">
+                and user_id = #{userId}
+            </if>
+            <if test="orderCode != null and orderCode != ''">
+                and order_code = #{orderCode}
+            </if>
+            <if test="customerName != null and customerName != ''">
+                and customer_name like concat('%', #{customerName}, '%')
+            </if>
+            <if test="orderStatus != null and orderStatus != ''">
+                and order_status = #{orderStatus}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectUnfinishedCustomerOrderById" parameterType="Long" resultMap="UnfinishedCustomerOrderResult">
+        <include refid="selectUnfinishedCustomerOrderVo"/>
+        where order_id = #{orderId}
+    </select>
+
+    <insert id="insertUnfinishedCustomerOrder" parameterType="UnfinishedCustomerOrder" useGeneratedKeys="true" keyProperty="orderId">
+        insert into unfinished_customer_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null and userId != 0">
+                user_id,
+            </if>
+            <if test="orderCode != null and orderCode != ''">
+                order_code,
+            </if>
+            <if test="customerName != null and customerName != ''">
+                customer_name,
+            </if>
+            <if test="orderAmount != null">
+                order_amount,
+            </if>
+            <if test="orderStatus != null and orderStatus != ''">
+                order_status,
+            </if>
+            create_time,
+            update_time,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null and userId != 0">
+                #{userId},
+            </if>
+            <if test="orderCode != null and orderCode != ''">
+                #{orderCode},
+            </if>
+            <if test="customerName != null and customerName != ''">
+                #{customerName},
+            </if>
+            <if test="orderAmount != null">
+                #{orderAmount},
+            </if>
+            <if test="orderStatus != null and orderStatus != ''">
+                #{orderStatus},
+            </if>
+            sysdate(),
+            sysdate(),
+        </trim>
+    </insert>
+
+    <update id="updateUnfinishedCustomerOrder" parameterType="UnfinishedCustomerOrder">
+        update unfinished_customer_order
+        <set>
+            <if test="userId != null and userId != 0">
+                user_id = #{userId},
+            </if>
+            <if test="orderCode != null and orderCode != ''">
+                order_code = #{orderCode},
+            </if>
+            <if test="customerName != null and customerName != ''">
+                customer_name = #{customerName},
+            </if>
+            <if test="orderAmount != null">
+                order_amount = #{orderAmount},
+            </if>
+            <if test="orderStatus != null and orderStatus != ''">
+                order_status = #{orderStatus},
+            </if>
+            update_time = sysdate(),
+        </set>
+        where order_id = #{orderId}
+    </update>
+
+    <delete id="deleteUnfinishedCustomerOrderById" parameterType="Long">
+        delete from unfinished_customer_order where order_id = #{orderId}
+    </delete>
+
+    <delete id="deleteUnfinishedCustomerOrderByIds" parameterType="Long">
+        delete from unfinished_customer_order where order_id in
+        <foreach item="orderId" collection="array" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.PendingEventDetailMapper">
+
+    <resultMap type="PendingEventDetail" id="PendingEventDetailResult">
+        <result property="detailId" column="detail_id"/>
+        <result property="eventId" column="event_id"/>
+        <result property="detailContent" column="detail_content"/>
+        <result property="detailType" column="detail_type"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectPendingEventDetailVo">
+        select detail_id, event_id, detail_content, detail_type, create_time, update_time
+        from pending_event_details
+    </sql>
+
+    <select id="selectPendingEventDetailById" parameterType="Long" resultMap="PendingEventDetailResult">
+        <include refid="selectPendingEventDetailVo"/>
+        where detail_id = #{detailId}
+    </select>
+
+    <select id="selectPendingEventDetailList" parameterType="PendingEventDetail" resultMap="PendingEventDetailResult">
+        <include refid="selectPendingEventDetailVo"/>
+        <where>
+            <if test="eventId != null and eventId != 0">
+                and event_id = #{eventId}
+            </if>
+            <if test="detailType != null and detailType != ''">
+                and detail_type = #{detailType}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <insert id="insertPendingEventDetail" parameterType="PendingEventDetail" useGeneratedKeys="true" keyProperty="detailId">
+        insert into pending_event_details
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="eventId != null and eventId != 0">
+                event_id,
+            </if>
+            <if test="detailContent != null and detailContent != ''">
+                detail_content,
+            </if>
+            <if test="detailType != null and detailType != ''">
+                detail_type,
+            </if>
+            create_time,
+            update_time,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="eventId != null and eventId != 0">
+                #{eventId},
+            </if>
+            <if test="detailContent != null and detailContent != ''">
+                #{detailContent},
+            </if>
+            <if test="detailType != null and detailType != ''">
+                #{detailType},
+            </if>
+            sysdate(),
+            sysdate(),
+        </trim>
+    </insert>
+
+    <update id="updatePendingEventDetail" parameterType="PendingEventDetail">
+        update pending_event_details
+        <set>
+            <if test="eventId != null and eventId != 0">
+                event_id = #{eventId},
+            </if>
+            <if test="detailContent != null and detailContent != ''">
+                detail_content = #{detailContent},
+            </if>
+            <if test="detailType != null and detailType != ''">
+                detail_type = #{detailType},
+            </if>
+            update_time = sysdate(),
+        </set>
+        where detail_id = #{detailId}
+    </update>
+
+    <delete id="deletePendingEventDetailById" parameterType="Long">
+        delete from pending_event_details where detail_id = #{detailId}
+    </delete>
+
+    <delete id="deletePendingEventDetailByIds" parameterType="Long">
+        delete from pending_event_details where detail_id in
+        <foreach item="detailId" collection="array" open="(" separator="," close=")">
+            #{detailId}
+        </foreach>
+    </delete>
+
+    <delete id="deletePendingEventDetailsByEventId" parameterType="Long">
+        delete from pending_event_details where event_id = #{eventId}
+    </delete>
+
+</mapper>

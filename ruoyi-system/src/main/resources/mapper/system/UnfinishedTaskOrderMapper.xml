@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.UnfinishedTaskOrderMapper">
+
+    <resultMap type="UnfinishedTaskOrder" id="UnfinishedTaskOrderResult">
+        <result property="taskId" column="task_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="taskCode" column="task_code"/>
+        <result property="taskName" column="task_name"/>
+        <result property="taskDescription" column="task_description"/>
+        <result property="taskStatus" column="task_status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectUnfinishedTaskOrderVo">
+        select task_id, user_id, task_code, task_name, task_description, task_status, create_time, update_time
+        from unfinished_task_order
+    </sql>
+
+    <select id="selectUnfinishedTaskOrderList" parameterType="UnfinishedTaskOrder" resultMap="UnfinishedTaskOrderResult">
+        <include refid="selectUnfinishedTaskOrderVo"/>
+        <where>
+            <if test="userId != null and userId != 0">
+                and user_id = #{userId}
+            </if>
+            <if test="taskCode != null and taskCode != ''">
+                and task_code = #{taskCode}
+            </if>
+            <if test="taskName != null and taskName != ''">
+                and task_name like concat('%', #{taskName}, '%')
+            </if>
+            <if test="taskStatus != null and taskStatus != ''">
+                and task_status = #{taskStatus}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectUnfinishedTaskOrderById" parameterType="Long" resultMap="UnfinishedTaskOrderResult">
+        <include refid="selectUnfinishedTaskOrderVo"/>
+        where task_id = #{taskId}
+    </select>
+
+    <insert id="insertUnfinishedTaskOrder" parameterType="UnfinishedTaskOrder" useGeneratedKeys="true" keyProperty="taskId">
+        insert into unfinished_task_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null and userId != 0">
+                user_id,
+            </if>
+            <if test="taskCode != null and taskCode != ''">
+                task_code,
+            </if>
+            <if test="taskName != null and taskName != ''">
+                task_name,
+            </if>
+            <if test="taskDescription != null and taskDescription != ''">
+                task_description,
+            </if>
+            <if test="taskStatus != null and taskStatus != ''">
+                task_status,
+            </if>
+            create_time,
+            update_time,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null and userId != 0">
+                #{userId},
+            </if>
+            <if test="taskCode != null and taskCode != ''">
+                #{taskCode},
+            </if>
+            <if test="taskName != null and taskName != ''">
+                #{taskName},
+            </if>
+            <if test="taskDescription != null and taskDescription != ''">
+                #{taskDescription},
+            </if>
+            <if test="taskStatus != null and taskStatus != ''">
+                #{taskStatus},
+            </if>
+            sysdate(),
+            sysdate(),
+        </trim>
+    </insert>
+
+    <update id="updateUnfinishedTaskOrder" parameterType="UnfinishedTaskOrder">
+        update unfinished_task_order
+        <set>
+            <if test="userId != null and userId != 0">
+                user_id = #{userId},
+            </if>
+            <if test="taskCode != null and taskCode != ''">
+                task_code = #{taskCode},
+            </if>
+            <if test="taskName != null and taskName != ''">
+                task_name = #{taskName},
+            </if>
+            <if test="taskDescription != null and taskDescription != ''">
+                task_description = #{taskDescription},
+            </if>
+            <if test="taskStatus != null and taskStatus != ''">
+                task_status = #{taskStatus},
+            </if>
+            update_time = sysdate(),
+        </set>
+        where task_id = #{taskId}
+    </update>
+
+    <delete id="deleteUnfinishedTaskOrderById" parameterType="Long">
+        delete from unfinished_task_order where task_id = #{taskId}
+    </delete>
+
+    <delete id="deleteUnfinishedTaskOrderByIds" parameterType="Long">
+        delete from unfinished_task_order where task_id in
+        <foreach item="taskId" collection="array" open="(" separator="," close=")">
+            #{taskId}
+        </foreach>
+    </delete>
+
+</mapper>
