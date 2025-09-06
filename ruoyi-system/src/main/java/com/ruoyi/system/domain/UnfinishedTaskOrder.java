@@ -28,8 +28,8 @@ public class UnfinishedTaskOrder extends BaseEntity
     /** 任务描述 */
     private String taskDescription;
 
-    /** 任务状态 */
-    private String taskStatus;
+    /** 任务状态（0未完工 1完工）*/
+    private Integer taskStatus;
 
     /** 创建时间 */
     private Date createTime;
@@ -85,11 +85,11 @@ public class UnfinishedTaskOrder extends BaseEntity
         this.taskDescription = taskDescription;
     }
 
-    public String getTaskStatus() {
+    public Integer getTaskStatus() {
         return taskStatus;
     }
 
-    public void setTaskStatus(String taskStatus) {
+    public void setTaskStatus(Integer taskStatus) {
         this.taskStatus = taskStatus;
     }
 

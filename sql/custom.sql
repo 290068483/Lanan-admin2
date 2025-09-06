@@ -64,7 +64,42 @@ CREATE TABLE unfinished_task_order (
                                        task_code VARCHAR(50) COMMENT '任务单编号',
                                        task_name VARCHAR(255) COMMENT '任务名称',
                                        task_description TEXT COMMENT '任务描述',
-                                       task_status VARCHAR(50) COMMENT '任务状态',
+                                       task_status INT COMMENT '任务状态（0未完工 1完工）',
                                        create_time DATETIME COMMENT '创建时间',
                                        update_time DATETIME COMMENT '更新时间'
 );
+
+-- 为unread_message表插入一条数据
+INSERT INTO unread_message (user_id, message_title, message_content, message_type, create_time, update_time)
+VALUES (
+           2,
+           '系统维护通知',
+           '系统将于今晚00:00-02:00进行维护，请提前做好准备',
+           'SYSTEM_MAINTENANCE',
+           NOW(),
+           NOW()
+       );
+
+-- 为unfinished_customer_order表插入一条数据
+INSERT INTO unfinished_customer_order (user_id, order_code, customer_name, order_amount, order_status, create_time, update_time)
+VALUES (
+           101,
+           'CO20250906001',
+           '张三',
+           1599.00,
+           'PENDING',
+           NOW(),
+           NOW()
+       );
+
+-- 为unfinished_task_order表插入一条数据
+INSERT INTO unfinished_task_order (user_id, task_code, task_name, task_description, task_status, create_time, update_time)
+VALUES (
+           201,
+           'TO20250906001',
+           '处理客户投诉',
+           '处理客户关于产品质量的投诉，需要在24小时内完成',
+           0,
+           NOW(),
+           NOW()
+       );

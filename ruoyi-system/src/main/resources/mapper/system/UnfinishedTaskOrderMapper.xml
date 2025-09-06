@@ -32,7 +32,7 @@
             <if test="taskName != null and taskName != ''">
                 and task_name like concat('%', #{taskName}, '%')
             </if>
-            <if test="taskStatus != null and taskStatus != ''">
+            <if test="taskStatus != null">
                 and task_status = #{taskStatus}
             </if>
         </where>
@@ -59,7 +59,7 @@
             <if test="taskDescription != null and taskDescription != ''">
                 task_description,
             </if>
-            <if test="taskStatus != null and taskStatus != ''">
+            <if test="taskStatus != null">
                 task_status,
             </if>
             create_time,
@@ -78,7 +78,7 @@
             <if test="taskDescription != null and taskDescription != ''">
                 #{taskDescription},
             </if>
-            <if test="taskStatus != null and taskStatus != ''">
+            <if test="taskStatus != null">
                 #{taskStatus},
             </if>
             sysdate(),
@@ -101,7 +101,7 @@
             <if test="taskDescription != null and taskDescription != ''">
                 task_description = #{taskDescription},
             </if>
-            <if test="taskStatus != null and taskStatus != ''">
+            <if test="taskStatus != null">
                 task_status = #{taskStatus},
             </if>
             update_time = sysdate(),
