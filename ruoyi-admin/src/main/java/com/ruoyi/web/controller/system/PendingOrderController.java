@@ -25,7 +25,7 @@ import com.ruoyi.system.service.IPendingOrderService;
  * @author ruoyi
  */
 @RestController
-@RequestMapping("/system/pendingorder")
+@RequestMapping("/customer/pending-orders")
 public class PendingOrderController extends BaseController
 {
     @Autowired
@@ -34,7 +34,7 @@ public class PendingOrderController extends BaseController
     /**
      * 查询待下单列表
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingorder:list')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingorder:list')")
     @GetMapping("/list")
     public TableDataInfo list(PendingOrder pendingOrder)
     {
@@ -46,7 +46,7 @@ public class PendingOrderController extends BaseController
     /**
      * 获取待下单详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingorder:query')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingorder:query')")
     @GetMapping(value = "/{progressId}")
     public AjaxResult getInfo(@PathVariable("progressId") Long progressId)
     {
@@ -56,7 +56,7 @@ public class PendingOrderController extends BaseController
     /**
      * 新增待下单
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingorder:add')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingorder:add')")
     @Log(title = "待下单", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody PendingOrder pendingOrder)
@@ -67,7 +67,7 @@ public class PendingOrderController extends BaseController
     /**
      * 修改待下单
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingorder:edit')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingorder:edit')")
     @Log(title = "待下单", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody PendingOrder pendingOrder)
@@ -78,7 +78,7 @@ public class PendingOrderController extends BaseController
     /**
      * 删除待下单
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingorder:remove')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingorder:remove')")
     @Log(title = "待下单", businessType = BusinessType.DELETE)
     @DeleteMapping("/{progressIds}")
     public AjaxResult remove(@PathVariable Long[] progressIds)

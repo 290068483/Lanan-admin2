@@ -25,7 +25,7 @@ import com.ruoyi.system.service.IPendingDeliveryService;
  * @author ruoyi
  */
 @RestController
-@RequestMapping("/system/pendingdelivery")
+@RequestMapping("/customer/pending-deliveries")
 public class PendingDeliveryController extends BaseController
 {
     @Autowired
@@ -34,7 +34,7 @@ public class PendingDeliveryController extends BaseController
     /**
      * 查询待出货列表
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingdelivery:list')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingdelivery:list')")
     @GetMapping("/list")
     public TableDataInfo list(PendingDelivery pendingDelivery)
     {
@@ -46,7 +46,7 @@ public class PendingDeliveryController extends BaseController
     /**
      * 获取待出货详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingdelivery:query')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingdelivery:query')")
     @GetMapping(value = "/{deliveryId}")
     public AjaxResult getInfo(@PathVariable("deliveryId") Long deliveryId)
     {
@@ -56,7 +56,7 @@ public class PendingDeliveryController extends BaseController
     /**
      * 新增待出货
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingdelivery:add')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingdelivery:add')")
     @Log(title = "待出货", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody PendingDelivery pendingDelivery)
@@ -67,7 +67,7 @@ public class PendingDeliveryController extends BaseController
     /**
      * 修改待出货
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingdelivery:edit')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingdelivery:edit')")
     @Log(title = "待出货", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody PendingDelivery pendingDelivery)
@@ -78,7 +78,7 @@ public class PendingDeliveryController extends BaseController
     /**
      * 删除待出货
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingdelivery:remove')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingdelivery:remove')")
     @Log(title = "待出货", businessType = BusinessType.DELETE)
     @DeleteMapping("/{deliveryIds}")
     public AjaxResult remove(@PathVariable Long[] deliveryIds)

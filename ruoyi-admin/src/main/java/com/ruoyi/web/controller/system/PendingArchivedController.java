@@ -25,7 +25,7 @@ import com.ruoyi.system.service.IPendingArchivedService;
  * @author ruoyi
  */
 @RestController
-@RequestMapping("/system/pendingarchived")
+@RequestMapping("/customer/pending-archives")
 public class PendingArchivedController extends BaseController
 {
     @Autowired
@@ -34,7 +34,7 @@ public class PendingArchivedController extends BaseController
     /**
      * 查询待归档列表
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingarchived:list')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingarchived:list')")
     @GetMapping("/list")
     public TableDataInfo list(PendingArchived pendingArchived)
     {
@@ -46,7 +46,7 @@ public class PendingArchivedController extends BaseController
     /**
      * 获取待归档详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingarchived:query')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingarchived:query')")
     @GetMapping(value = "/{archiveId}")
     public AjaxResult getInfo(@PathVariable("archiveId") Long archiveId)
     {
@@ -56,7 +56,7 @@ public class PendingArchivedController extends BaseController
     /**
      * 新增待归档
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingarchived:add')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingarchived:add')")
     @Log(title = "待归档", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody PendingArchived pendingArchived)
@@ -67,7 +67,7 @@ public class PendingArchivedController extends BaseController
     /**
      * 修改待归档
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingarchived:edit')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingarchived:edit')")
     @Log(title = "待归档", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody PendingArchived pendingArchived)
@@ -78,7 +78,7 @@ public class PendingArchivedController extends BaseController
     /**
      * 删除待归档
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingarchived:remove')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingarchived:remove')")
     @Log(title = "待归档", businessType = BusinessType.DELETE)
     @DeleteMapping("/{archiveIds}")
     public AjaxResult remove(@PathVariable Long[] archiveIds)

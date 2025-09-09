@@ -25,7 +25,7 @@ import com.ruoyi.system.service.IPendingContractService;
  * @author ruoyi
  */
 @RestController
-@RequestMapping("/system/pendingcontract")
+@RequestMapping("/customer/pending-contracts")
 public class PendingContractController extends BaseController
 {
     @Autowired
@@ -34,7 +34,7 @@ public class PendingContractController extends BaseController
     /**
      * 查询待签合同列表
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingcontract:list')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingcontract:list')")
     @GetMapping("/list")
     public TableDataInfo list(PendingContract pendingContract)
     {
@@ -46,7 +46,7 @@ public class PendingContractController extends BaseController
     /**
      * 获取待签合同详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingcontract:query')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingcontract:query')")
     @GetMapping(value = "/{contractId}")
     public AjaxResult getInfo(@PathVariable("contractId") Long contractId)
     {
@@ -56,7 +56,7 @@ public class PendingContractController extends BaseController
     /**
      * 新增待签合同
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingcontract:add')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingcontract:add')")
     @Log(title = "待签合同", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody PendingContract pendingContract)
@@ -67,7 +67,7 @@ public class PendingContractController extends BaseController
     /**
      * 修改待签合同
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingcontract:edit')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingcontract:edit')")
     @Log(title = "待签合同", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody PendingContract pendingContract)
@@ -78,7 +78,7 @@ public class PendingContractController extends BaseController
     /**
      * 删除待签合同
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingcontract:remove')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingcontract:remove')")
     @Log(title = "待签合同", businessType = BusinessType.DELETE)
     @DeleteMapping("/{contractIds}")
     public AjaxResult remove(@PathVariable Long[] contractIds)

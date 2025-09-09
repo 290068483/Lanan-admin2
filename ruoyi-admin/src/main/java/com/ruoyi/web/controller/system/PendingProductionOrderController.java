@@ -25,7 +25,7 @@ import com.ruoyi.system.service.IPendingProductionOrderService;
  * @author ruoyi
  */
 @RestController
-@RequestMapping("/system/pendingproductionorder")
+@RequestMapping("/customer/pending-productions")
 public class PendingProductionOrderController extends BaseController
 {
     @Autowired
@@ -34,7 +34,7 @@ public class PendingProductionOrderController extends BaseController
     /**
      * 查询待生产列表
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingproductionorder:list')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingproductionorder:list')")
     @GetMapping("/list")
     public TableDataInfo list(PendingProductionOrder pendingProductionOrder)
     {
@@ -46,7 +46,7 @@ public class PendingProductionOrderController extends BaseController
     /**
      * 获取待生产详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingproductionorder:query')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingproductionorder:query')")
     @GetMapping(value = "/{pendingOrderId}")
     public AjaxResult getInfo(@PathVariable("pendingOrderId") Long pendingOrderId)
     {
@@ -56,7 +56,7 @@ public class PendingProductionOrderController extends BaseController
     /**
      * 新增待生产
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingproductionorder:add')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingproductionorder:add')")
     @Log(title = "待生产", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody PendingProductionOrder pendingProductionOrder)
@@ -67,7 +67,7 @@ public class PendingProductionOrderController extends BaseController
     /**
      * 修改待生产
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingproductionorder:edit')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingproductionorder:edit')")
     @Log(title = "待生产", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody PendingProductionOrder pendingProductionOrder)
@@ -78,7 +78,7 @@ public class PendingProductionOrderController extends BaseController
     /**
      * 删除待生产
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingproductionorder:remove')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingproductionorder:remove')")
     @Log(title = "待生产", businessType = BusinessType.DELETE)
     @DeleteMapping("/{pendingOrderIds}")
     public AjaxResult remove(@PathVariable Long[] pendingOrderIds)

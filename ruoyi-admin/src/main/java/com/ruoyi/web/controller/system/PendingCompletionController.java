@@ -25,7 +25,7 @@ import com.ruoyi.system.service.IPendingCompletionService;
  * @author ruoyi
  */
 @RestController
-@RequestMapping("/system/pendingcompletion")
+@RequestMapping("/customer/pending-completions")
 public class PendingCompletionController extends BaseController
 {
     @Autowired
@@ -34,7 +34,7 @@ public class PendingCompletionController extends BaseController
     /**
      * 查询待完工列表
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingcompletion:list')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingcompletion:list')")
     @GetMapping("/list")
     public TableDataInfo list(PendingCompletion pendingCompletion)
     {
@@ -46,7 +46,7 @@ public class PendingCompletionController extends BaseController
     /**
      * 获取待完工详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingcompletion:query')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingcompletion:query')")
     @GetMapping(value = "/{installationId}")
     public AjaxResult getInfo(@PathVariable("installationId") Long installationId)
     {
@@ -56,7 +56,7 @@ public class PendingCompletionController extends BaseController
     /**
      * 新增待完工
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingcompletion:add')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingcompletion:add')")
     @Log(title = "待完工", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody PendingCompletion pendingCompletion)
@@ -67,7 +67,7 @@ public class PendingCompletionController extends BaseController
     /**
      * 修改待完工
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingcompletion:edit')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingcompletion:edit')")
     @Log(title = "待完工", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody PendingCompletion pendingCompletion)
@@ -78,7 +78,7 @@ public class PendingCompletionController extends BaseController
     /**
      * 删除待完工
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingcompletion:remove')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingcompletion:remove')")
     @Log(title = "待完工", businessType = BusinessType.DELETE)
     @DeleteMapping("/{installationIds}")
     public AjaxResult remove(@PathVariable Long[] installationIds)

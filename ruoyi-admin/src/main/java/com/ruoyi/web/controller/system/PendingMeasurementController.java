@@ -25,7 +25,7 @@ import com.ruoyi.system.service.IPendingMeasurementService;
  * @author ruoyi
  */
 @RestController
-@RequestMapping("/system/pendingmeasurement")
+@RequestMapping("/customer/pending-measurements")
 public class PendingMeasurementController extends BaseController
 {
     @Autowired
@@ -34,7 +34,7 @@ public class PendingMeasurementController extends BaseController
     /**
      * 查询待测量列表
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingmeasurement:list')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingmeasurement:list')")
     @GetMapping("/list")
     public TableDataInfo list(PendingMeasurement pendingMeasurement)
     {
@@ -46,7 +46,7 @@ public class PendingMeasurementController extends BaseController
     /**
      * 获取待测量详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingmeasurement:query')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingmeasurement:query')")
     @GetMapping(value = "/{measurementId}")
     public AjaxResult getInfo(@PathVariable("measurementId") Long measurementId)
     {
@@ -56,7 +56,7 @@ public class PendingMeasurementController extends BaseController
     /**
      * 新增待测量
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingmeasurement:add')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingmeasurement:add')")
     @Log(title = "待测量", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody PendingMeasurement pendingMeasurement)
@@ -67,7 +67,7 @@ public class PendingMeasurementController extends BaseController
     /**
      * 修改待测量
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingmeasurement:edit')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingmeasurement:edit')")
     @Log(title = "待测量", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody PendingMeasurement pendingMeasurement)
@@ -78,7 +78,7 @@ public class PendingMeasurementController extends BaseController
     /**
      * 删除待测量
      */
-    @PreAuthorize("@ss.hasPermi('system:pendingmeasurement:remove')")
+    @PreAuthorize("@ss.hasPermi('customer:pendingmeasurement:remove')")
     @Log(title = "待测量", businessType = BusinessType.DELETE)
     @DeleteMapping("/{measurementIds}")
     public AjaxResult remove(@PathVariable Long[] measurementIds)
