@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.custom_info.mapper.CusTaskProgressMapper">
+    
+    <resultMap type="com.ruoyi.custom_info.domain.CusTaskProgress" id="CusTaskProgressResult">
+        <result property="id"    column="id"    />
+        <result property="taskName"    column="task_name"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="completionTime"    column="completion_time"    />
+        <result property="taskProperty"    column="task_property"    />
+        <result property="publisher"    column="publisher"    />
+        <result property="taskDescription"    column="task_description"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedTime"    column="updated_time"    />
+        <result property="isDeleted"    column="is_deleted"    />
+        <result property="progress"    column="progress"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+    
+    <sql id="selectCusTaskProgressVo">
+        select id, task_name, start_time, completion_time, task_property, publisher, task_description, created_time, updated_time, is_deleted from cus_task_progress
+    </sql>
+    
+    <select id="selectCusTaskProgressList" parameterType="com.ruoyi.custom_info.domain.CusTaskProgress" resultMap="CusTaskProgressResult">
+        <include refid="selectCusTaskProgressVo"/>
+        <where>  
+            <if test="taskName != null  and taskName != ''"> and task_name like concat('%', #{taskName}, '%')</if>
+            <if test="publisher != null  and publisher != ''"> and publisher like concat('%', #{publisher}, '%')</if>
+            <if test="startTime != null "> and start_time >= #{startTime}</if>
+            <if test="completionTime != null "> and completion_time &lt;= #{completionTime}</if>
+            <if test="taskProperty != null  and taskProperty != ''"> and task_property = #{taskProperty}</if>
+            <if test="isDeleted != null "> and is_deleted = #{isDeleted}</if>
+        </where>
+        order by created_time desc
+    </select>
+    
+    <select id="selectCusTaskProgressById" parameterType="Long" resultMap="CusTaskProgressResult">
+        <include refid="selectCusTaskProgressVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertCusTaskProgress" parameterType="com.ruoyi.custom_info.domain.CusTaskProgress" useGeneratedKeys="true" keyProperty="id">
+        insert into cus_task_progress
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="taskName != null and taskName != ''">task_name,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="completionTime != null">completion_time,</if>
+            <if test="taskProperty != null">task_property,</if>
+            <if test="publisher != null">publisher,</if>
+            <if test="taskDescription != null">task_description,</if>
+            <if test="createdTime != null">created_time,</if>
+            <if test="updatedTime != null">updated_time,</if>
+            <if test="isDeleted != null">is_deleted,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="taskName != null and taskName != ''">#{taskName},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="completionTime != null">#{completionTime},</if>
+            <if test="taskProperty != null">#{taskProperty},</if>
+            <if test="publisher != null">#{publisher},</if>
+            <if test="taskDescription != null">#{taskDescription},</if>
+            <if test="createdTime != null">#{createdTime},</if>
+            <if test="updatedTime != null">#{updatedTime},</if>
+            <if test="isDeleted != null">#{isDeleted},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateCusTaskProgress" parameterType="com.ruoyi.custom_info.domain.CusTaskProgress">
+        update cus_task_progress
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="taskName != null and taskName != ''">task_name = #{taskName},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="completionTime != null">completion_time = #{completionTime},</if>
+            <if test="taskProperty != null">task_property = #{taskProperty},</if>
+            <if test="publisher != null">publisher = #{publisher},</if>
+            <if test="taskDescription != null">task_description = #{taskDescription},</if>
+            <if test="createdTime != null">created_time = #{createdTime},</if>
+            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </trim>
+        where id = #{id}
+    </update>
+	
+    <delete id="deleteCusTaskProgressById" parameterType="Long">
+        delete from cus_task_progress where id = #{id}
+    </delete>
+	
+    <delete id="deleteCusTaskProgressByIds" parameterType="Long">
+        delete from cus_task_progress where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

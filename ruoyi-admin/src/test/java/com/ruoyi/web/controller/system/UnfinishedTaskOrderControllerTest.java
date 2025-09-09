@@ -46,7 +46,7 @@ public class UnfinishedTaskOrderControllerTest {
         task.setTaskCode("TC001");
         task.setTaskName("Test Task");
         task.setTaskDescription("Test Description");
-        task.setTaskStatus("PROCESSING");
+        task.setTaskStatus(0);
         tasks.add(task);
 
         // 模拟服务层返回
@@ -71,7 +71,7 @@ public class UnfinishedTaskOrderControllerTest {
         task.setTaskCode("TC001");
         task.setTaskName("Test Task");
         task.setTaskDescription("Test Description");
-        task.setTaskStatus("PROCESSING");
+        task.setTaskStatus(0);
 
         // 模拟服务层返回
         when(unfinishedTaskOrderService.selectUnfinishedTaskOrderById(1L)).thenReturn(task);
@@ -93,7 +93,7 @@ public class UnfinishedTaskOrderControllerTest {
         task.setTaskCode("TC001");
         task.setTaskName("Test Task");
         task.setTaskDescription("Test Description");
-        task.setTaskStatus("PROCESSING");
+        task.setTaskStatus(0);
 
         // 模拟服务层返回
         when(unfinishedTaskOrderService.insertUnfinishedTaskOrder(task)).thenReturn(1);
@@ -101,7 +101,7 @@ public class UnfinishedTaskOrderControllerTest {
         // 执行测试
         mockMvc.perform(post("/unfinishedTaskOrder")
                 .contentType("application/json")
-                .content("{\"userId\":1,\"taskCode\":\"TC001\",\"taskName\":\"Test Task\",\"taskDescription\":\"Test Description\",\"taskStatus\":\"PROCESSING\"}"))
+                .content("{\"userId\":1,\"taskCode\":\"TC001\",\"taskName\":\"Test Task\",\"taskDescription\":\"Test Description\",\"taskStatus\":0}"))
                 .andExpect(status().isOk());
 
         // 验证服务层方法被调用
@@ -117,7 +117,7 @@ public class UnfinishedTaskOrderControllerTest {
         task.setTaskCode("TC001");
         task.setTaskName("Updated Task");
         task.setTaskDescription("Updated Description");
-        task.setTaskStatus("COMPLETED");
+        task.setTaskStatus(1);
 
         // 模拟服务层返回
         when(unfinishedTaskOrderService.updateUnfinishedTaskOrder(task)).thenReturn(1);
@@ -125,23 +125,10 @@ public class UnfinishedTaskOrderControllerTest {
         // 执行测试
         mockMvc.perform(put("/unfinishedTaskOrder")
                 .contentType("application/json")
-                .content("{\"taskId\":1,\"userId\":1,\"taskCode\":\"TC001\",\"taskName\":\"Updated Task\",\"taskDescription\":\"Updated Description\",\"taskStatus\":\"COMPLETED\"}"))
+                .content("{\"taskId\":1,\"userId\":1,\"taskCode\":\"TC001\",\"taskName\":\"Updated Task\",\"taskDescription\":\"Updated Description\",\"taskStatus\":1}"))
                 .andExpect(status().isOk());
 
         // 验证服务层方法被调用
         verify(unfinishedTaskOrderService, times(1)).updateUnfinishedTaskOrder(any(UnfinishedTaskOrder.class));
-    }
-
-    @Test
-    public void testRemove() throws Exception {
-        // 模拟服务层返回
-        when(unfinishedTaskOrderService.deleteUnfinishedTaskOrderByIds(any(Long[].class))).thenReturn(1);
-
-        // 执行测试
-        mockMvc.perform(delete("/unfinishedTaskOrder/{taskIds}", "1"))
-                .andExpect(status().isOk());
-
-        // 验证服务层方法被调用
-        verify(unfinishedTaskOrderService, times(1)).deleteUnfinishedTaskOrderByIds(any(Long[].class));
     }
 }

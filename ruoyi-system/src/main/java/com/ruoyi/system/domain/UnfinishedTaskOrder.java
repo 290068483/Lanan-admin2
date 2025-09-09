@@ -28,7 +28,7 @@ public class UnfinishedTaskOrder extends BaseEntity
     /** 任务描述 */
     private String taskDescription;
 
-    /** 任务状态（0未完工 1完工）*/
+    /** 任务状态 */
     private Integer taskStatus;
 
     /** 创建时间 */

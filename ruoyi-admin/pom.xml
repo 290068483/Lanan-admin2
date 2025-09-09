@@ -18,11 +18,13 @@
     <dependencies>
 
         <!-- spring-boot-devtools -->
+        <!--
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
-            <optional>true</optional> <!-- 表示依赖不会传递 -->
+            <optional>true</optional>
         </dependency>
+        -->
 
         <!-- swagger3-->
         <dependency>
@@ -59,6 +61,12 @@
         <dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-generator</artifactId>
+        </dependency>
+
+        <!-- 系统模块-->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-system</artifactId>
         </dependency>
 
         <!-- Spring Boot Test依赖 -->

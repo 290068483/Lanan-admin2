@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.PendingMeasurementMapper">
+    
+    <resultMap type="PendingMeasurement" id="PendingMeasurementResult">
+        <result property="measurementId" column="measurement_id"/>
+        <result property="customId" column="custom_id"/>
+        <result property="customerName" column="customer_name"/>
+        <result property="urgency" column="urgency"/>
+        <result property="deposit" column="deposit"/>
+        <result property="customerDate" column="customer_date"/>
+        <result property="currentStatus" column="current_status"/>
+        <result property="focusStyle" column="focus_style"/>
+        <result property="pendingMeasurementDate" column="pending_measurement_date"/>
+        <result property="customerSource" column="customer_source"/>
+        <result property="salesman" column="salesman"/>
+        <result property="details" column="details"/>
+    </resultMap>
+    
+    <sql id="selectPendingMeasurementVo">
+        select measurement_id, custom_id, customer_name, urgency, deposit, customer_date, current_status, focus_style, pending_measurement_date, customer_source, salesman, details from pending_measurement
+    </sql>
+    
+    <select id="selectPendingMeasurementList" parameterType="PendingMeasurement" resultMap="PendingMeasurementResult">
+        <include refid="selectPendingMeasurementVo"/>
+        <where>
+            <if test="customerName != null and customerName != ''">
+                and customer_name like concat('%', #{customerName}, '%')
+            </if>
+            <if test="salesman != null and salesman != ''">
+                and salesman like concat('%', #{salesman}, '%')
+            </if>
+            <if test="deposit != null">
+                and deposit = #{deposit}
+            </if>
+            <if test="customerDate != null">
+                and customer_date = #{customerDate}
+            </if>
+            <if test="currentStatus != null and currentStatus != ''">
+                and current_status = #{currentStatus}
+            </if>
+            <if test="urgency != null">
+                and urgency = #{urgency}
+            </if>
+        </where>
+        order by measurement_id desc
+    </select>
+    
+    <select id="selectPendingMeasurementById" parameterType="Long" resultMap="PendingMeasurementResult">
+        <include refid="selectPendingMeasurementVo"/>
+        where measurement_id = #{measurementId}
+    </select>
+    
+    <insert id="insertPendingMeasurement" parameterType="PendingMeasurement">
+        insert into pending_measurement
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="customId != null">
+                custom_id,
+            </if>
+            <if test="customerName != null and customerName != ''">
+                customer_name,
+            </if>
+            <if test="urgency != null">
+                urgency,
+            </if>
+            <if test="deposit != null">
+                deposit,
+            </if>
+            <if test="customerDate != null">
+                customer_date,
+            </if>
+            <if test="currentStatus != null and currentStatus != ''">
+                current_status,
+            </if>
+            <if test="focusStyle != null and focusStyle != ''">
+                focus_style,
+            </if>
+            <if test="pendingMeasurementDate != null">
+                pending_measurement_date,
+            </if>
+            <if test="customerSource != null and customerSource != ''">
+                customer_source,
+            </if>
+            <if test="salesman != null and salesman != ''">
+                salesman,
+            </if>
+            <if test="details != null and details != ''">
+                details,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="customId != null">
+                #{customId},
+            </if>
+            <if test="customerName != null and customerName != ''">
+                #{customerName},
+            </if>
+            <if test="urgency != null">
+                #{urgency},
+            </if>
+            <if test="deposit != null">
+                #{deposit},
+            </if>
+            <if test="customerDate != null">
+                #{customerDate},
+            </if>
+            <if test="currentStatus != null and currentStatus != ''">
+                #{currentStatus},
+            </if>
+            <if test="focusStyle != null and focusStyle != ''">
+                #{focusStyle},
+            </if>
+            <if test="pendingMeasurementDate != null">
+                #{pendingMeasurementDate},
+            </if>
+            <if test="customerSource != null and customerSource != ''">
+                #{customerSource},
+            </if>
+            <if test="salesman != null and salesman != ''">
+                #{salesman},
+            </if>
+            <if test="details != null and details != ''">
+                #{details},
+            </if>
+        </trim>
+    </insert>
+    
+    <update id="updatePendingMeasurement" parameterType="PendingMeasurement">
+        update pending_measurement
+        <set>
+            <if test="customId != null">
+                custom_id = #{customId},
+            </if>
+            <if test="customerName != null and customerName != ''">
+                customer_name = #{customerName},
+            </if>
+            <if test="urgency != null">
+                urgency = #{urgency},
+            </if>
+            <if test="deposit != null">
+                deposit = #{deposit},
+            </if>
+            <if test="customerDate != null">
+                customer_date = #{customerDate},
+            </if>
+            <if test="currentStatus != null and currentStatus != ''">
+                current_status = #{currentStatus},
+            </if>
+            <if test="focusStyle != null and focusStyle != ''">
+                focus_style = #{focusStyle},
+            </if>
+            <if test="pendingMeasurementDate != null">
+                pending_measurement_date = #{pendingMeasurementDate},
+            </if>
+            <if test="customerSource != null and customerSource != ''">
+                customer_source = #{customerSource},
+            </if>
+            <if test="salesman != null and salesman != ''">
+                salesman = #{salesman},
+            </if>
+            <if test="details != null and details != ''">
+                details = #{details},
+            </if>
+        </set>
+        where measurement_id = #{measurementId}
+    </update>
+    
+    <delete id="deletePendingMeasurementById" parameterType="Long">
+        delete from pending_measurement where measurement_id = #{measurementId}
+    </delete>
+    
+    <delete id="deletePendingMeasurementByIds" parameterType="Long">
+        delete from pending_measurement where measurement_id in
+        <foreach item="measurementId" collection="array" open="(" separator="," close=")">
+            #{measurementId}
+        </foreach>
+    </delete>
+</mapper>

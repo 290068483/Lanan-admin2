@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.PendingProductionOrderMapper">
+    
+    <resultMap type="PendingProductionOrder" id="PendingProductionOrderResult">
+        <result property="pendingOrderId" column="pending_order_id"/>
+        <result property="customId" column="custom_id"/>
+        <result property="customerName" column="customer_name"/>
+        <result property="contractPaymentTime" column="contract_payment_time"/>
+        <result property="totalContractAmount" column="total_contract_amount"/>
+        <result property="deliveryDate" column="delivery_date"/>
+        <result property="salesman" column="salesman"/>
+        <result property="designer" column="designer"/>
+        <result property="currentProgress" column="current_progress"/>
+        <result property="details" column="details"/>
+        <result property="remarks" column="remarks"/>
+        <result property="intention" column="intention"/>
+    </resultMap>
+    
+    <sql id="selectPendingProductionOrderVo">
+        select pending_order_id, custom_id, customer_name, contract_payment_time, total_contract_amount, delivery_date, salesman, designer, current_progress, details, remarks, intention from pending_production_order
+    </sql>
+    
+    <select id="selectPendingProductionOrderList" parameterType="PendingProductionOrder" resultMap="PendingProductionOrderResult">
+        <include refid="selectPendingProductionOrderVo"/>
+        <where>
+            <if test="customerName != null and customerName != ''">
+                and customer_name like concat('%', #{customerName}, '%')
+            </if>
+            <if test="contractPaymentTime != null">
+                and contract_payment_time = #{contractPaymentTime}
+            </if>
+            <if test="deliveryDate != null">
+                and delivery_date = #{deliveryDate}
+            </if>
+            <if test="salesman != null and salesman != ''">
+                and salesman like concat('%', #{salesman}, '%')
+            </if>
+            <if test="designer != null and designer != ''">
+                and designer like concat('%', #{designer}, '%')
+            </if>
+            <if test="currentProgress != null">
+                and current_progress = #{currentProgress}
+            </if>
+        </where>
+        order by pending_order_id desc
+    </select>
+    
+    <select id="selectPendingProductionOrderById" parameterType="Long" resultMap="PendingProductionOrderResult">
+        <include refid="selectPendingProductionOrderVo"/>
+        where pending_order_id = #{pendingOrderId}
+    </select>
+    
+    <insert id="insertPendingProductionOrder" parameterType="PendingProductionOrder">
+        insert into pending_production_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="customId != null">
+                custom_id,
+            </if>
+            <if test="customerName != null and customerName != ''">
+                customer_name,
+            </if>
+            <if test="contractPaymentTime != null">
+                contract_payment_time,
+            </if>
+            <if test="totalContractAmount != null">
+                total_contract_amount,
+            </if>
+            <if test="deliveryDate != null">
+                delivery_date,
+            </if>
+            <if test="salesman != null and salesman != ''">
+                salesman,
+            </if>
+            <if test="designer != null and designer != ''">
+                designer,
+            </if>
+            <if test="currentProgress != null">
+                current_progress,
+            </if>
+            <if test="details != null and details != ''">
+                details,
+            </if>
+            <if test="remarks != null and remarks != ''">
+                remarks,
+            </if>
+            <if test="intention != null">
+                intention,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="customId != null">
+                #{customId},
+            </if>
+            <if test="customerName != null and customerName != ''">
+                #{customerName},
+            </if>
+            <if test="contractPaymentTime != null">
+                #{contractPaymentTime},
+            </if>
+            <if test="totalContractAmount != null">
+                #{totalContractAmount},
+            </if>
+            <if test="deliveryDate != null">
+                #{deliveryDate},
+            </if>
+            <if test="salesman != null and salesman != ''">
+                #{salesman},
+            </if>
+            <if test="designer != null and designer != ''">
+                #{designer},
+            </if>
+            <if test="currentProgress != null">
+                #{currentProgress},
+            </if>
+            <if test="details != null and details != ''">
+                #{details},
+            </if>
+            <if test="remarks != null and remarks != ''">
+                #{remarks},
+            </if>
+            <if test="intention != null">
+                #{intention},
+            </if>
+        </trim>
+    </insert>
+    
+    <update id="updatePendingProductionOrder" parameterType="PendingProductionOrder">
+        update pending_production_order
+        <set>
+            <if test="customId != null">
+                custom_id = #{customId},
+            </if>
+            <if test="customerName != null and customerName != ''">
+                customer_name = #{customerName},
+            </if>
+            <if test="contractPaymentTime != null">
+                contract_payment_time = #{contractPaymentTime},
+            </if>
+            <if test="totalContractAmount != null">
+                total_contract_amount = #{totalContractAmount},
+            </if>
+            <if test="deliveryDate != null">
+                delivery_date = #{deliveryDate},
+            </if>
+            <if test="salesman != null and salesman != ''">
+                salesman = #{salesman},
+            </if>
+            <if test="designer != null and designer != ''">
+                designer = #{designer},
+            </if>
+            <if test="currentProgress != null">
+                current_progress = #{currentProgress},
+            </if>
+            <if test="details != null and details != ''">
+                details = #{details},
+            </if>
+            <if test="remarks != null and remarks != ''">
+                remarks = #{remarks},
+            </if>
+            <if test="intention != null">
+                intention = #{intention},
+            </if>
+        </set>
+        where pending_order_id = #{pendingOrderId}
+    </update>
+    
+    <delete id="deletePendingProductionOrderById" parameterType="Long">
+        delete from pending_production_order where pending_order_id = #{pendingOrderId}
+    </delete>
+    
+    <delete id="deletePendingProductionOrderByIds" parameterType="Long">
+        delete from pending_production_order where pending_order_id in
+        <foreach item="pendingOrderId" collection="array" open="(" separator="," close=")">
+            #{pendingOrderId}
+        </foreach>
+    </delete>
+</mapper>

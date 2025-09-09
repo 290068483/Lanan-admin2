@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.PendingOrderMapper">
+    
+    <resultMap type="PendingOrder" id="PendingOrderResult">
+        <result property="progressId" column="progress_id"/>
+        <result property="customId" column="custom_id"/>
+        <result property="customerName" column="customer_name"/>
+        <result property="intention" column="intention"/>
+        <result property="estimatedOrderTime" column="estimated_order_time"/>
+        <result property="estimatedPrice" column="estimated_price"/>
+        <result property="currentStatus" column="current_status"/>
+        <result property="focusStyle" column="focus_style"/>
+        <result property="recentContact" column="recent_contact"/>
+        <result property="customerSource" column="customer_source"/>
+        <result property="salesman" column="salesman"/>
+        <result property="details" column="details"/>
+    </resultMap>
+    
+    <sql id="selectPendingOrderVo">
+        select progress_id, custom_id, customer_name, intention, estimated_order_time, estimated_price, current_status, focus_style, recent_contact, customer_source, salesman, details from pending_order
+    </sql>
+    
+    <select id="selectPendingOrderList" parameterType="PendingOrder" resultMap="PendingOrderResult">
+        <include refid="selectPendingOrderVo"/>
+        <where>
+            <if test="customerName != null and customerName != ''">
+                and customer_name like concat('%', #{customerName}, '%')
+            </if>
+            <if test="estimatedOrderTime != null">
+                and estimated_order_time = #{estimatedOrderTime}
+            </if>
+            <if test="salesman != null and salesman != ''">
+                and salesman like concat('%', #{salesman}, '%')
+            </if>
+        </where>
+        order by progress_id desc
+    </select>
+    
+    <select id="selectPendingOrderById" parameterType="Long" resultMap="PendingOrderResult">
+        <include refid="selectPendingOrderVo"/>
+        where progress_id = #{progressId}
+    </select>
+    
+    <insert id="insertPendingOrder" parameterType="PendingOrder">
+        insert into pending_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="customId != null">
+                custom_id,
+            </if>
+            <if test="customerName != null and customerName != ''">
+                customer_name,
+            </if>
+            <if test="intention != null">
+                intention,
+            </if>
+            <if test="estimatedOrderTime != null">
+                estimated_order_time,
+            </if>
+            <if test="estimatedPrice != null">
+                estimated_price,
+            </if>
+            <if test="currentStatus != null and currentStatus != ''">
+                current_status,
+            </if>
+            <if test="focusStyle != null and focusStyle != ''">
+                focus_style,
+            </if>
+            <if test="recentContact != null">
+                recent_contact,
+            </if>
+            <if test="customerSource != null and customerSource != ''">
+                customer_source,
+            </if>
+            <if test="salesman != null and salesman != ''">
+                salesman,
+            </if>
+            <if test="details != null and details != ''">
+                details,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="customId != null">
+                #{customId},
+            </if>
+            <if test="customerName != null and customerName != ''">
+                #{customerName},
+            </if>
+            <if test="intention != null">
+                #{intention},
+            </if>
+            <if test="estimatedOrderTime != null">
+                #{estimatedOrderTime},
+            </if>
+            <if test="estimatedPrice != null">
+                #{estimatedPrice},
+            </if>
+            <if test="currentStatus != null and currentStatus != ''">
+                #{currentStatus},
+            </if>
+            <if test="focusStyle != null and focusStyle != ''">
+                #{focusStyle},
+            </if>
+            <if test="recentContact != null">
+                #{recentContact},
+            </if>
+            <if test="customerSource != null and customerSource != ''">
+                #{customerSource},
+            </if>
+            <if test="salesman != null and salesman != ''">
+                #{salesman},
+            </if>
+            <if test="details != null and details != ''">
+                #{details},
+            </if>
+        </trim>
+    </insert>
+    
+    <update id="updatePendingOrder" parameterType="PendingOrder">
+        update pending_order
+        <set>
+            <if test="customId != null">
+                custom_id = #{customId},
+            </if>
+            <if test="customerName != null and customerName != ''">
+                customer_name = #{customerName},
+            </if>
+            <if test="intention != null">
+                intention = #{intention},
+            </if>
+            <if test="estimatedOrderTime != null">
+                estimated_order_time = #{estimatedOrderTime},
+            </if>
+            <if test="estimatedPrice != null">
+                estimated_price = #{estimatedPrice},
+            </if>
+            <if test="currentStatus != null and currentStatus != ''">
+                current_status = #{currentStatus},
+            </if>
+            <if test="focusStyle != null and focusStyle != ''">
+                focus_style = #{focusStyle},
+            </if>
+            <if test="recentContact != null">
+                recent_contact = #{recentContact},
+            </if>
+            <if test="customerSource != null and customerSource != ''">
+                customer_source = #{customerSource},
+            </if>
+            <if test="salesman != null and salesman != ''">
+                salesman = #{salesman},
+            </if>
+            <if test="details != null and details != ''">
+                details = #{details},
+            </if>
+        </set>
+        where progress_id = #{progressId}
+    </update>
+    
+    <delete id="deletePendingOrderById" parameterType="Long">
+        delete from pending_order where progress_id = #{progressId}
+    </delete>
+    
+    <delete id="deletePendingOrderByIds" parameterType="Long">
+        delete from pending_order where progress_id in
+        <foreach item="progressId" collection="array" open="(" separator="," close=")">
+            #{progressId}
+        </foreach>
+    </delete>
+</mapper>

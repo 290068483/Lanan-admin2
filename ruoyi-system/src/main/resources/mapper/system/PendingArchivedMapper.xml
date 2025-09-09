@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.PendingArchivedMapper">
+    
+    <resultMap type="PendingArchived" id="PendingArchivedResult">
+        <result property="archiveId" column="archive_id"/>
+        <result property="customId" column="custom_id"/>
+        <result property="customerName" column="customer_name"/>
+        <result property="customerSatisfaction" column="customer_satisfaction"/>
+        <result property="orderDate" column="order_date"/>
+        <result property="completionDate" column="completion_date"/>
+        <result property="totalContractAmount" column="total_contract_amount"/>
+        <result property="salesman" column="salesman"/>
+        <result property="designer" column="designer"/>
+        <result property="installer" column="installer"/>
+        <result property="measurementCount" column="measurement_count"/>
+        <result property="afterSalesCount" column="after_sales_count"/>
+        <result property="extendedRelationship" column="extended_relationship"/>
+        <result property="details" column="details"/>
+    </resultMap>
+    
+    <sql id="selectPendingArchivedVo">
+        select archive_id, custom_id, customer_name, customer_satisfaction, order_date, completion_date, total_contract_amount, salesman, designer, installer, measurement_count, after_sales_count, extended_relationship, details from pending_archived
+    </sql>
+    
+    <select id="selectPendingArchivedList" parameterType="PendingArchived" resultMap="PendingArchivedResult">
+        <include refid="selectPendingArchivedVo"/>
+        <where>
+            <if test="customerName != null and customerName != ''">
+                and customer_name like concat('%', #{customerName}, '%')
+            </if>
+            <if test="orderDate != null">
+                and order_date = #{orderDate}
+            </if>
+            <if test="completionDate != null">
+                and completion_date = #{completionDate}
+            </if>
+            <if test="totalContractAmount != null">
+                and total_contract_amount = #{totalContractAmount}
+            </if>
+            <if test="salesman != null and salesman != ''">
+                and salesman like concat('%', #{salesman}, '%')
+            </if>
+            <if test="designer != null and designer != ''">
+                and designer like concat('%', #{designer}, '%')
+            </if>
+            <if test="installer != null and installer != ''">
+                and installer like concat('%', #{installer}, '%')
+            </if>
+        </where>
+        order by archive_id desc
+    </select>
+    
+    <select id="selectPendingArchivedById" parameterType="Long" resultMap="PendingArchivedResult">
+        <include refid="selectPendingArchivedVo"/>
+        where archive_id = #{archiveId}
+    </select>
+    
+    <insert id="insertPendingArchived" parameterType="PendingArchived">
+        insert into pending_archived
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="customId != null">
+                custom_id,
+            </if>
+            <if test="customerName != null and customerName != ''">
+                customer_name,
+            </if>
+            <if test="customerSatisfaction != null">
+                customer_satisfaction,
+            </if>
+            <if test="orderDate != null">
+                order_date,
+            </if>
+            <if test="completionDate != null">
+                completion_date,
+            </if>
+            <if test="totalContractAmount != null">
+                total_contract_amount,
+            </if>
+            <if test="salesman != null and salesman != ''">
+                salesman,
+            </if>
+            <if test="designer != null and designer != ''">
+                designer,
+            </if>
+            <if test="installer != null and installer != ''">
+                installer,
+            </if>
+            <if test="measurementCount != null">
+                measurement_count,
+            </if>
+            <if test="afterSalesCount != null">
+                after_sales_count,
+            </if>
+            <if test="extendedRelationship != null and extendedRelationship != ''">
+                extended_relationship,
+            </if>
+            <if test="details != null and details != ''">
+                details,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="customId != null">
+                #{customId},
+            </if>
+            <if test="customerName != null and customerName != ''">
+                #{customerName},
+            </if>
+            <if test="customerSatisfaction != null">
+                #{customerSatisfaction},
+            </if>
+            <if test="orderDate != null">
+                #{orderDate},
+            </if>
+            <if test="completionDate != null">
+                #{completionDate},
+            </if>
+            <if test="totalContractAmount != null">
+                #{totalContractAmount},
+            </if>
+            <if test="salesman != null and salesman != ''">
+                #{salesman},
+            </if>
+            <if test="designer != null and designer != ''">
+                #{designer},
+            </if>
+            <if test="installer != null and installer != ''">
+                #{installer},
+            </if>
+            <if test="measurementCount != null">
+                #{measurementCount},
+            </if>
+            <if test="afterSalesCount != null">
+                #{afterSalesCount},
+            </if>
+            <if test="extendedRelationship != null and extendedRelationship != ''">
+                #{extendedRelationship},
+            </if>
+            <if test="details != null and details != ''">
+                #{details},
+            </if>
+        </trim>
+    </insert>
+    
+    <update id="updatePendingArchived" parameterType="PendingArchived">
+        update pending_archived
+        <set>
+            <if test="customId != null">
+                custom_id = #{customId},
+            </if>
+            <if test="customerName != null and customerName != ''">
+                customer_name = #{customerName},
+            </if>
+            <if test="customerSatisfaction != null">
+                customer_satisfaction = #{customerSatisfaction},
+            </if>
+            <if test="orderDate != null">
+                order_date = #{orderDate},
+            </if>
+            <if test="completionDate != null">
+                completion_date = #{completionDate},
+            </if>
+            <if test="totalContractAmount != null">
+                total_contract_amount = #{totalContractAmount},
+            </if>
+            <if test="salesman != null and salesman != ''">
+                salesman = #{salesman},
+            </if>
+            <if test="designer != null and designer != ''">
+                designer = #{designer},
+            </if>
+            <if test="installer != null and installer != ''">
+                installer = #{installer},
+            </if>
+            <if test="measurementCount != null">
+                measurement_count = #{measurementCount},
+            </if>
+            <if test="afterSalesCount != null">
+                after_sales_count = #{afterSalesCount},
+            </if>
+            <if test="extendedRelationship != null and extendedRelationship != ''">
+                extended_relationship = #{extendedRelationship},
+            </if>
+            <if test="details != null and details != ''">
+                details = #{details},
+            </if>
+        </set>
+        where archive_id = #{archiveId}
+    </update>
+    
+    <delete id="deletePendingArchivedById" parameterType="Long">
+        delete from pending_archived where archive_id = #{archiveId}
+    </delete>
+    
+    <delete id="deletePendingArchivedByIds" parameterType="Long">
+        delete from pending_archived where archive_id in
+        <foreach item="archiveId" collection="array" open="(" separator="," close=")">
+            #{archiveId}
+        </foreach>
+    </delete>
+</mapper>

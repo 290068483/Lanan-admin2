@@ -1,6 +1,5 @@
 package com.ruoyi.system.service;
 
-import com.ruoyi.RuoYiApplication;
 import com.ruoyi.system.domain.UnfinishedTaskOrder;
 import com.ruoyi.system.mapper.UnfinishedTaskOrderMapper;
 import com.ruoyi.system.service.impl.UnfinishedTaskOrderServiceImpl;
@@ -9,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +15,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = RuoYiApplication.class)
 public class UnfinishedTaskOrderServiceTest {
 
     @Mock
@@ -41,7 +38,7 @@ public class UnfinishedTaskOrderServiceTest {
         task.setTaskCode("TC001");
         task.setTaskName("Test Task");
         task.setTaskDescription("Test Description");
-        task.setTaskStatus("PROCESSING");
+        task.setTaskStatus(0);
         expectedList.add(task);
 
         // 模拟Mapper层返回
@@ -68,7 +65,7 @@ public class UnfinishedTaskOrderServiceTest {
         expectedTask.setTaskCode("TC001");
         expectedTask.setTaskName("Test Task");
         expectedTask.setTaskDescription("Test Description");
-        expectedTask.setTaskStatus("PROCESSING");
+        expectedTask.setTaskStatus(0);
 
         // 模拟Mapper层返回
         when(unfinishedTaskOrderMapper.selectUnfinishedTaskOrderById(1L)).thenReturn(expectedTask);
@@ -92,7 +89,7 @@ public class UnfinishedTaskOrderServiceTest {
         task.setTaskCode("TC001");
         task.setTaskName("Test Task");
         task.setTaskDescription("Test Description");
-        task.setTaskStatus("PROCESSING");
+        task.setTaskStatus(0);
 
         // 模拟Mapper层返回
         when(unfinishedTaskOrderMapper.insertUnfinishedTaskOrder(task)).thenReturn(1);
@@ -116,7 +113,7 @@ public class UnfinishedTaskOrderServiceTest {
         task.setTaskCode("TC001");
         task.setTaskName("Updated Task");
         task.setTaskDescription("Updated Description");
-        task.setTaskStatus("COMPLETED");
+        task.setTaskStatus(1);
 
         // 模拟Mapper层返回
         when(unfinishedTaskOrderMapper.updateUnfinishedTaskOrder(task)).thenReturn(1);

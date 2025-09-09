@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.PendingCompletionMapper">
+    
+    <resultMap type="PendingCompletion" id="PendingCompletionResult">
+        <result property="installationId" column="installation_id"/>
+        <result property="customId" column="custom_id"/>
+        <result property="customerName" column="customer_name"/>
+        <result property="urgency" column="urgency"/>
+        <result property="contractPaymentDate" column="contract_payment_date"/>
+        <result property="installationDate" column="installation_date"/>
+        <result property="pendingProcessingDate" column="pending_processing_date"/>
+        <result property="salesman" column="salesman"/>
+        <result property="designer" column="designer"/>
+        <result property="installer" column="installer"/>
+        <result property="details" column="details"/>
+    </resultMap>
+    
+    <sql id="selectPendingCompletionVo">
+        select installation_id, custom_id, customer_name, urgency, contract_payment_date, installation_date, pending_processing_date, salesman, designer, installer, details from pending_completion
+    </sql>
+    
+    <select id="selectPendingCompletionList" parameterType="PendingCompletion" resultMap="PendingCompletionResult">
+        <include refid="selectPendingCompletionVo"/>
+        <where>
+            <if test="customerName != null and customerName != ''">
+                and customer_name like concat('%', #{customerName}, '%')
+            </if>
+            <if test="contractPaymentDate != null">
+                and contract_payment_date = #{contractPaymentDate}
+            </if>
+            <if test="installationDate != null">
+                and installation_date = #{installationDate}
+            </if>
+            <if test="pendingProcessingDate != null">
+                and pending_processing_date = #{pendingProcessingDate}
+            </if>
+            <if test="salesman != null and salesman != ''">
+                and salesman like concat('%', #{salesman}, '%')
+            </if>
+            <if test="designer != null and designer != ''">
+                and designer like concat('%', #{designer}, '%')
+            </if>
+            <if test="installer != null and installer != ''">
+                and installer like concat('%', #{installer}, '%')
+            </if>
+            <if test="urgency != null">
+                and urgency = #{urgency}
+            </if>
+        </where>
+        order by installation_id desc
+    </select>
+    
+    <select id="selectPendingCompletionById" parameterType="Long" resultMap="PendingCompletionResult">
+        <include refid="selectPendingCompletionVo"/>
+        where installation_id = #{installationId}
+    </select>
+    
+    <insert id="insertPendingCompletion" parameterType="PendingCompletion">
+        insert into pending_completion
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="customId != null">
+                custom_id,
+            </if>
+            <if test="customerName != null and customerName != ''">
+                customer_name,
+            </if>
+            <if test="urgency != null">
+                urgency,
+            </if>
+            <if test="contractPaymentDate != null">
+                contract_payment_date,
+            </if>
+            <if test="installationDate != null">
+                installation_date,
+            </if>
+            <if test="pendingProcessingDate != null">
+                pending_processing_date,
+            </if>
+            <if test="salesman != null and salesman != ''">
+                salesman,
+            </if>
+            <if test="designer != null and designer != ''">
+                designer,
+            </if>
+            <if test="installer != null and installer != ''">
+                installer,
+            </if>
+            <if test="details != null and details != ''">
+                details,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="customId != null">
+                #{customId},
+            </if>
+            <if test="customerName != null and customerName != ''">
+                #{customerName},
+            </if>
+            <if test="urgency != null">
+                #{urgency},
+            </if>
+            <if test="contractPaymentDate != null">
+                #{contractPaymentDate},
+            </if>
+            <if test="installationDate != null">
+                #{installationDate},
+            </if>
+            <if test="pendingProcessingDate != null">
+                #{pendingProcessingDate},
+            </if>
+            <if test="salesman != null and salesman != ''">
+                #{salesman},
+            </if>
+            <if test="designer != null and designer != ''">
+                #{designer},
+            </if>
+            <if test="installer != null and installer != ''">
+                #{installer},
+            </if>
+            <if test="details != null and details != ''">
+                #{details},
+            </if>
+        </trim>
+    </insert>
+    
+    <update id="updatePendingCompletion" parameterType="PendingCompletion">
+        update pending_completion
+        <set>
+            <if test="customId != null">
+                custom_id = #{customId},
+            </if>
+            <if test="customerName != null and customerName != ''">
+                customer_name = #{customerName},
+            </if>
+            <if test="urgency != null">
+                urgency = #{urgency},
+            </if>
+            <if test="contractPaymentDate != null">
+                contract_payment_date = #{contractPaymentDate},
+            </if>
+            <if test="installationDate != null">
+                installation_date = #{installationDate},
+            </if>
+            <if test="pendingProcessingDate != null">
+                pending_processing_date = #{pendingProcessingDate},
+            </if>
+            <if test="salesman != null and salesman != ''">
+                salesman = #{salesman},
+            </if>
+            <if test="designer != null and designer != ''">
+                designer = #{designer},
+            </if>
+            <if test="installer != null and installer != ''">
+                installer = #{installer},
+            </if>
+            <if test="details != null and details != ''">
+                details = #{details},
+            </if>
+        </set>
+        where installation_id = #{installationId}
+    </update>
+    
+    <delete id="deletePendingCompletionById" parameterType="Long">
+        delete from pending_completion where installation_id = #{installationId}
+    </delete>
+    
+    <delete id="deletePendingCompletionByIds" parameterType="Long">
+        delete from pending_completion where installation_id in
+        <foreach item="installationId" collection="array" open="(" separator="," close=")">
+            #{installationId}
+        </foreach>
+    </delete>
+</mapper>

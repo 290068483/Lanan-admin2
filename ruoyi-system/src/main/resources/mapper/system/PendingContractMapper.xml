@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.PendingContractMapper">
+    
+    <resultMap type="PendingContract" id="PendingContractResult">
+        <result property="contractId" column="contract_id"/>
+        <result property="customId" column="custom_id"/>
+        <result property="customerName" column="customer_name"/>
+        <result property="urgency" column="urgency"/>
+        <result property="deposit" column="deposit"/>
+        <result property="orderDate" column="order_date"/>
+        <result property="measurementDate" column="measurement_date"/>
+        <result property="customerSource" column="customer_source"/>
+        <result property="salesman" column="salesman"/>
+        <result property="designer" column="designer"/>
+        <result property="details" column="details"/>
+    </resultMap>
+    
+    <sql id="selectPendingContractVo">
+        select contract_id, custom_id, customer_name, urgency, deposit, order_date, measurement_date, customer_source, salesman, designer, details from pending_contract
+    </sql>
+    
+    <select id="selectPendingContractList" parameterType="PendingContract" resultMap="PendingContractResult">
+        <include refid="selectPendingContractVo"/>
+        <where>
+            <if test="customerName != null and customerName != ''">
+                and customer_name like concat('%', #{customerName}, '%')
+            </if>
+            <if test="urgency != null">
+                and urgency = #{urgency}
+            </if>
+            <if test="deposit != null">
+                and deposit = #{deposit}
+            </if>
+            <if test="orderDate != null">
+                and order_date = #{orderDate}
+            </if>
+            <if test="measurementDate != null">
+                and measurement_date = #{measurementDate}
+            </if>
+            <if test="customerSource != null and customerSource != ''">
+                and customer_source = #{customerSource}
+            </if>
+            <if test="salesman != null and salesman != ''">
+                and salesman like concat('%', #{salesman}, '%')
+            </if>
+            <if test="designer != null and designer != ''">
+                and designer like concat('%', #{designer}, '%')
+            </if>
+        </where>
+        order by contract_id desc
+    </select>
+    
+    <select id="selectPendingContractById" parameterType="Long" resultMap="PendingContractResult">
+        <include refid="selectPendingContractVo"/>
+        where contract_id = #{contractId}
+    </select>
+    
+    <insert id="insertPendingContract" parameterType="PendingContract">
+        insert into pending_contract
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="customId != null">
+                custom_id,
+            </if>
+            <if test="customerName != null and customerName != ''">
+                customer_name,
+            </if>
+            <if test="urgency != null">
+                urgency,
+            </if>
+            <if test="deposit != null">
+                deposit,
+            </if>
+            <if test="orderDate != null">
+                order_date,
+            </if>
+            <if test="measurementDate != null">
+                measurement_date,
+            </if>
+            <if test="customerSource != null and customerSource != ''">
+                customer_source,
+            </if>
+            <if test="salesman != null and salesman != ''">
+                salesman,
+            </if>
+            <if test="designer != null and designer != ''">
+                designer,
+            </if>
+            <if test="details != null and details != ''">
+                details,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="customId != null">
+                #{customId},
+            </if>
+            <if test="customerName != null and customerName != ''">
+                #{customerName},
+            </if>
+            <if test="urgency != null">
+                #{urgency},
+            </if>
+            <if test="deposit != null">
+                #{deposit},
+            </if>
+            <if test="orderDate != null">
+                #{orderDate},
+            </if>
+            <if test="measurementDate != null">
+                #{measurementDate},
+            </if>
+            <if test="customerSource != null and customerSource != ''">
+                #{customerSource},
+            </if>
+            <if test="salesman != null and salesman != ''">
+                #{salesman},
+            </if>
+            <if test="designer != null and designer != ''">
+                #{designer},
+            </if>
+            <if test="details != null and details != ''">
+                #{details},
+            </if>
+        </trim>
+    </insert>
+    
+    <update id="updatePendingContract" parameterType="PendingContract">
+        update pending_contract
+        <set>
+            <if test="customId != null">
+                custom_id = #{customId},
+            </if>
+            <if test="customerName != null and customerName != ''">
+                customer_name = #{customerName},
+            </if>
+            <if test="urgency != null">
+                urgency = #{urgency},
+            </if>
+            <if test="deposit != null">
+                deposit = #{deposit},
+            </if>
+            <if test="orderDate != null">
+                order_date = #{orderDate},
+            </if>
+            <if test="measurementDate != null">
+                measurement_date = #{measurementDate},
+            </if>
+            <if test="customerSource != null and customerSource != ''">
+                customer_source = #{customerSource},
+            </if>
+            <if test="salesman != null and salesman != ''">
+                salesman = #{salesman},
+            </if>
+            <if test="designer != null and designer != ''">
+                designer = #{designer},
+            </if>
+            <if test="details != null and details != ''">
+                details = #{details},
+            </if>
+        </set>
+        where contract_id = #{contractId}
+    </update>
+    
+    <delete id="deletePendingContractById" parameterType="Long">
+        delete from pending_contract where contract_id = #{contractId}
+    </delete>
+    
+    <delete id="deletePendingContractByIds" parameterType="Long">
+        delete from pending_contract where contract_id in
+        <foreach item="contractId" collection="array" open="(" separator="," close=")">
+            #{contractId}
+        </foreach>
+    </delete>
+</mapper>
